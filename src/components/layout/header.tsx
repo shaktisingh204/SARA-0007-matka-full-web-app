@@ -1,17 +1,16 @@
+
 'use client';
 
 import { Button } from '@/components/ui/button';
 import { Bell, Menu, Wallet2 } from 'lucide-react';
+import { SidebarTrigger } from '@/components/ui/sidebar';
 
 export function Header() {
   return (
     <header className="sticky top-0 z-10 flex h-16 items-center justify-between gap-4 border-b bg-background px-4">
       <div className="flex items-center gap-4">
-        <Button variant="ghost" size="icon" className="md:hidden">
-          <Menu className="h-6 w-6" />
-          <span className="sr-only">Toggle Menu</span>
-        </Button>
-        <h1 className="text-2xl font-bold">
+        <SidebarTrigger className="md:hidden" />
+        <h1 className="text-2xl font-bold md:hidden">
           <span className="text-primary">Sara</span>
           <span>999</span>
         </h1>

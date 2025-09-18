@@ -1,8 +1,9 @@
+
 import { PassbookClient } from "@/components/passbook/passbook-client";
 
 export default function PassbookPage() {
   return (
-    <div className="space-y-6 p-4 md:p-6">
+    <div className="space-y-6">
       <div>
         <h1 className="font-headline text-3xl font-bold tracking-tight">
           Passbook

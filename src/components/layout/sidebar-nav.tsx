@@ -1,3 +1,4 @@
+
 'use client';
 
 import {
@@ -13,12 +14,16 @@ import {
   ScrollText,
   Wallet,
   BookText,
+  Gavel,
+  Book,
 } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
 const navItems = [
   { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
+  { href: '/bids', label: 'My Bids', icon: Gavel },
+  { href: '/passbook', label: 'Passbook', icon: Book },
   { href: '/predictions', label: 'Predictions', icon: Target },
   { href: '/charts', label: 'Charts', icon: LineChart },
   { href: '/results', label: 'Results', icon: ScrollText },
@@ -36,7 +41,7 @@ export function SidebarNav() {
           <SidebarMenuItem key={item.href}>
             <Link href={item.href}>
               <SidebarMenuButton
-                isActive={pathname === item.href}
+                isActive={pathname.startsWith(item.href)}
                 tooltip={item.label}
               >
                 <item.icon />
