@@ -105,6 +105,7 @@ export default function DashboardPage() {
 
     useEffect(() => {
         const fetchGames = async () => {
+            setLoading(true);
             const data = await getGames();
             setGames(data);
             setLoading(false);
