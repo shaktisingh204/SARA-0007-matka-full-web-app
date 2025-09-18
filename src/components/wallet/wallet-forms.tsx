@@ -12,7 +12,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { DollarSign, ArrowDownCircle, ArrowUpCircle } from 'lucide-react';
+import { IndianRupee, ArrowDownCircle, ArrowUpCircle } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 export function WalletForms() {
@@ -73,7 +73,7 @@ export function WalletForms() {
                 <div className="space-y-1">
                   <Label htmlFor="amount">Amount</Label>
                   <div className="relative">
-                    <DollarSign className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                    <IndianRupee className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
                     <Input id="amount" name="amount" type="number" placeholder="0.00" className="pl-8" required />
                   </div>
                 </div>
@@ -97,7 +97,7 @@ export function WalletForms() {
                 <div className="space-y-1">
                   <Label htmlFor="amount">Amount</Label>
                    <div className="relative">
-                    <DollarSign className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                    <IndianRupee className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
                     <Input id="amount" name="amount" type="number" placeholder="0.00" className="pl-8" required />
                   </div>
                 </div>
