@@ -17,6 +17,9 @@ import {
   Gavel,
   Book,
   IndianRupee,
+  ShieldCheck,
+  FileText,
+  HeartHandshake,
 } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -31,6 +34,9 @@ const navItems = [
   { href: '/wallet', label: 'Wallet', icon: Wallet },
   { href: '/rules', label: 'How to Play', icon: BookText },
   { href: '/rates', label: 'Game Rates', icon: IndianRupee },
+  { href: '/privacy-policy', label: 'Privacy Policy', icon: ShieldCheck },
+  { href: '/terms-and-conditions', label: 'Terms & Conditions', icon: FileText },
+  { href: '/responsible-gambling', label: 'Responsible Gambling', icon: HeartHandshake },
 ];
 
 export function SidebarNav() {
