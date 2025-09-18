@@ -1,7 +1,7 @@
 
 import { games } from '@/lib/data';
 import { notFound } from 'next/navigation';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -13,14 +13,6 @@ export default function PlayGamePage({ params }: { params: { gameId: string } })
   if (!game) {
     notFound();
   }
-
-  const gameTypes = [
-    { id: 'single', name: 'Single Digit' },
-    { id: 'jodi', name: 'Jodi' },
-    { id: 'single-patti', name: 'Single Patti' },
-    { id: 'double-patti', name: 'Double Patti' },
-    { id: 'triple-patti', name: 'Triple Patti' },
-  ];
 
   return (
     <div className="p-4 space-y-4">
