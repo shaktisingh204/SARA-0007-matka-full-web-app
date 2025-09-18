@@ -21,6 +21,14 @@ const betTypes: { [key: string]: { name: string, description: string, minLength:
         validation: (numStr) => /^\d$/.test(numStr),
         validationMessage: 'Please enter a single digit (0-9).'
     },
+    'ank': {
+        name: 'Single (Ank)',
+        description: 'Enter a single digit from 0-9',
+        minLength: 1,
+        maxLength: 1,
+        validation: (numStr) => /^\d$/.test(numStr),
+        validationMessage: 'Please enter a single digit (0-9).'
+    },
     'jodi': { 
         name: 'Jodi', 
         description: 'Enter a two-digit number from 00-99', 
