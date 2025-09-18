@@ -83,7 +83,7 @@ function GameCard({ game }: { game: typeof games[0] }) {
           ) : (
             <>
               <p className="text-destructive text-xs font-semibold mb-2">Closed for today</p>
-               <Link href="/charts" className="flex flex-col items-center">
+               <Link href={`/charts?gameId=${game.id}`} className="flex flex-col items-center">
                 <Button variant="outline" size="icon" className="h-12 w-12 rounded-full mb-1">
                   <LineChart className="h-6 w-6" />
                 </Button>
@@ -105,7 +105,7 @@ export default function DashboardPage() {
         <p>Welcome --Welcome --Welcome</p>
       </div>
 
-      <div className="p-4 space-y-4">
+      <div className="space-y-4 p-4">
         <div className="grid grid-cols-2 gap-4">
           <Button className="h-12 bg-primary rounded-full font-bold text-lg">
             <Play className="mr-2 h-6 w-6 fill-primary-foreground" />

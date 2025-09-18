@@ -1,8 +1,9 @@
 import { HistoricalChart } from "@/components/charts/historical-chart";
+import { Suspense } from "react";
 
 export default function ChartsPage() {
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 p-4">
       <div>
         <h1 className="font-headline text-3xl font-bold tracking-tight">
           Historical Charts
@@ -11,7 +12,9 @@ export default function ChartsPage() {
           Analyze past results to find winning number patterns.
         </p>
       </div>
-      <HistoricalChart />
+      <Suspense fallback={<div>Loading chart...</div>}>
+        <HistoricalChart />
+      </Suspense>
     </div>
   );
 }
