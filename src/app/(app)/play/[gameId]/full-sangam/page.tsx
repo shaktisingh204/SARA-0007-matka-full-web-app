@@ -6,16 +6,33 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter }
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Trash2 } from 'lucide-react';
+import { Trash2, Loader2, CheckCircle } from 'lucide-react';
+import { useFormState, useFormStatus } from 'react-dom';
+import { submitFullSangamBids } from '@/app/actions/bets';
 
 type Bid = {
     id: number;
     openPatti: string;
     closePatti: string;
     amount: string;
+}
+
+function SubmitButton() {
+  const { pending } = useFormStatus();
+  return (
+    <Button type="submit" className="w-full" disabled={pending}>
+       {pending ? (
+        <>
+          <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Submitting...
+        </>
+      ) : (
+        'Submit All Bids'
+      )}
+    </Button>
+  );
 }
 
 export default function FullSangamPage() {
@@ -29,6 +46,21 @@ export default function FullSangamPage() {
     const [closePatti, setClosePatti] = useState('');
     const [betAmount, setBetAmount] = useState('');
     const [bids, setBids] = useState<Bid[]>([]);
+    
+    const initialState = { error: undefined, success: undefined };
+    const [state, dispatch] = useFormState(submitFullSangamBids, initialState);
+    
+    useEffect(() => {
+        if (state.error) {
+          toast({ title: 'Submission Error', description: state.error, variant: 'destructive' });
+        }
+        if (state.success) {
+          toast({ title: 'Bids Submitted', description: `${bids.length} Full Sangam bids have been successfully placed.`,
+            action: <CheckCircle className="h-5 w-5 text-green-500" />
+          });
+          setBids([]);
+        }
+    }, [state, toast, bids.length]);
 
     if (!game) {
         notFound();
@@ -71,15 +103,6 @@ export default function FullSangamPage() {
 
     const removeBid = (id: number) => {
         setBids(bids.filter(bid => bid.id !== id));
-    }
-
-    const submitAllBids = () => {
-        if (bids.length === 0) {
-            toast({ title: "No Bids", description: "Please add at least one bid to submit.", variant: "destructive"});
-            return;
-        }
-        toast({ title: "Bids Submitted", description: `${bids.length} Full Sangam bids have been successfully placed.`});
-        setBids([]);
     }
 
     return (
@@ -160,7 +183,10 @@ export default function FullSangamPage() {
                         </Table>
                     </CardContent>
                     <CardFooter>
-                        <Button className="w-full" onClick={submitAllBids}>Submit All Bids</Button>
+                        <form action={dispatch} className="w-full">
+                            <input type="hidden" name="bids" value={JSON.stringify(bids)} />
+                            <SubmitButton />
+                        </form>
                     </CardFooter>
                 </Card>
             )}

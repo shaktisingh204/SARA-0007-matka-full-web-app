@@ -7,10 +7,12 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Trash2 } from 'lucide-react';
+import { Trash2, Loader2, CheckCircle } from 'lucide-react';
+import { useFormState, useFormStatus } from 'react-dom';
+import { submitBids } from '@/app/actions/bets';
 
 const betTypes: { [key: string]: { name: string, description: string, minLength: number, maxLength: number, validation: (numStr: string) => boolean, validationMessage: string } } = {
     'ank': {
@@ -79,7 +81,24 @@ type Bid = {
     market: 'open' | 'close' | 'jodi';
     number: string;
     amount: string;
+    betType: string;
 }
+
+function SubmitButton() {
+  const { pending } = useFormStatus();
+  return (
+    <Button type="submit" className="w-full" disabled={pending}>
+       {pending ? (
+        <>
+          <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Submitting...
+        </>
+      ) : (
+        'Submit All Bids'
+      )}
+    </Button>
+  );
+}
+
 
 export default function PlaceBetPage() {
   const params = useParams();
@@ -95,6 +114,22 @@ export default function PlaceBetPage() {
   const [betNumber, setBetNumber] = useState('');
   const [betAmount, setBetAmount] = useState('');
   const [bids, setBids] = useState<Bid[]>([]);
+
+  const initialState = { error: undefined, success: undefined };
+  const [state, dispatch] = useFormState(submitBids, initialState);
+
+  useEffect(() => {
+    if (state.error) {
+      toast({ title: 'Submission Error', description: state.error, variant: 'destructive' });
+    }
+    if (state.success) {
+      toast({ title: 'Bids Submitted', description: `${bids.length} bids have been successfully placed.`,
+        action: <CheckCircle className="h-5 w-5 text-green-500" />
+      });
+      setBids([]);
+    }
+  }, [state, toast, bids.length]);
+
 
   if (!game || !betType) {
     notFound();
@@ -123,7 +158,8 @@ export default function PlaceBetPage() {
         id: Date.now(),
         market: isJodi ? 'jodi' : market,
         number: betNumber.padStart(betType.minLength, '0'),
-        amount: betAmount
+        amount: betAmount,
+        betType: betTypeKey
     };
 
     setBids(prevBids => [...prevBids, newBid]);
@@ -135,16 +171,6 @@ export default function PlaceBetPage() {
     setBids(bids.filter(bid => bid.id !== id));
   }
   
-  const submitAllBids = () => {
-      if (bids.length === 0) {
-          toast({ title: "No Bids", description: "Please add at least one bid to submit.", variant: "destructive"});
-          return;
-      }
-      toast({ title: "Bids Submitted", description: `${bids.length} bids have been successfully placed.`});
-      setBids([]);
-  }
-
-
   return (
     <div className="p-4 space-y-4">
       <Card>
@@ -226,7 +252,10 @@ export default function PlaceBetPage() {
                 </Table>
             </CardContent>
             <CardFooter>
-                <Button className="w-full" onClick={submitAllBids}>Submit All Bids</Button>
+                <form action={dispatch} className="w-full">
+                  <input type="hidden" name="bids" value={JSON.stringify(bids)} />
+                  <SubmitButton />
+                </form>
             </CardFooter>
         </Card>
       )}
