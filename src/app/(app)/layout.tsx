@@ -26,13 +26,11 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
           </SidebarContent>
           <SidebarRail />
         </Sidebar>
-        <div className="flex flex-1 flex-col">
-          <div className="flex-1 flex flex-col overflow-x-hidden">
-            <Header />
-            <main className="flex-1 pb-20 md:pb-0">
-              {children}
-            </main>
-          </div>
+        <div className="flex-1 flex flex-col min-w-0">
+          <Header />
+          <main className="flex-1 overflow-y-auto pb-20 md:pb-0">
+            {children}
+          </main>
           <BottomNav />
         </div>
       </div>
