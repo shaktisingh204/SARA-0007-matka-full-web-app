@@ -3,7 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { games } from "@/lib/data";
-import { Play, MessageSquare } from "lucide-react";
+import { Play, MessageSquare, LineChart } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
@@ -71,16 +71,26 @@ function GameCard({ game }: { game: typeof games[0] }) {
         </div>
         <div className="flex flex-col items-center justify-center text-center">
           {isOpen ? (
-            <p className="text-green-600 text-xs font-semibold mb-2">Open for biding</p>
+            <>
+              <p className="text-green-600 text-xs font-semibold mb-2">Open for biding</p>
+              <Link href={`/play/${game.id}`} className="flex flex-col items-center">
+                <Button variant="default" size="icon" className="h-12 w-12 rounded-full bg-primary mb-1">
+                  <Play className="h-6 w-6 fill-primary-foreground" />
+                </Button>
+                <p className="text-sm font-semibold">Play Game</p>
+              </Link>
+            </>
           ) : (
-            <p className="text-destructive text-xs font-semibold mb-2">Closed for today</p>
+            <>
+              <p className="text-destructive text-xs font-semibold mb-2">Closed for today</p>
+               <Link href="/charts" className="flex flex-col items-center">
+                <Button variant="outline" size="icon" className="h-12 w-12 rounded-full mb-1">
+                  <LineChart className="h-6 w-6" />
+                </Button>
+                <p className="text-sm font-semibold">View Chart</p>
+              </Link>
+            </>
           )}
-          <Link href={`/play/${game.id}`} className="flex flex-col items-center">
-            <Button variant="default" size="icon" className="h-12 w-12 rounded-full bg-primary mb-1" disabled={!isOpen}>
-              <Play className="h-6 w-6 fill-primary-foreground" />
-            </Button>
-            <p className="text-sm font-semibold">Play Game</p>
-          </Link>
         </div>
       </CardContent>
     </Card>
