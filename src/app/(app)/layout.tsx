@@ -13,7 +13,7 @@ import { SidebarNav } from '@/components/layout/sidebar-nav';
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   return (
     <SidebarProvider>
-      <div className="md:flex min-h-screen">
+      <div className="relative md:flex min-h-screen overflow-hidden">
         <Sidebar>
           <SidebarContent>
             <SidebarHeader>
