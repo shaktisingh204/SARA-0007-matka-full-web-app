@@ -1,9 +1,59 @@
+
+'use client';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { games } from "@/lib/data";
 import { Play, MessageSquare } from "lucide-react";
+import { useEffect, useState } from "react";
 
 function GameCard({ game }: { game: typeof games[0] }) {
+  const [isOpen, setIsOpen] = useState(false);
+
+  useEffect(() => {
+    if (game.openTime === '24 Hours') {
+      setIsOpen(true);
+      return;
+    }
+
+    const checkStatus = () => {
+      const now = new Date();
+      const [openHour, openMinute] = game.openTime.split(':').map(Number);
+      const [closeHour, closeMinute] = game.closeTime.split(':').map(Number);
+      
+      const openTime = new Date();
+      openTime.setHours(openHour, openMinute, 0);
+
+      const closeTime = new Date();
+      closeTime.setHours(closeHour, closeMinute, 0);
+      
+      if (closeTime < openTime) { // overnight game
+        if (now >= openTime || now < closeTime) {
+            setIsOpen(true);
+        } else {
+            setIsOpen(false);
+        }
+      } else { // same day game
+        if (now >= openTime && now < closeTime) {
+            setIsOpen(true);
+        } else {
+            setIsOpen(false);
+        }
+      }
+    };
+    
+    checkStatus();
+    const interval = setInterval(checkStatus, 60000); // Check every minute
+    return () => clearInterval(interval);
+
+  }, [game.openTime, game.closeTime]);
+
+  const closeTimeText = game.closeTime ? (
+    <div>
+      <p>Close Time:</p>
+      <p className="font-semibold text-foreground">{game.closeTime}</p>
+    </div>
+  ) : null;
+
   return (
     <Card>
       <CardContent className="p-4 grid grid-cols-3 items-center gap-4">
@@ -15,15 +65,16 @@ function GameCard({ game }: { game: typeof games[0] }) {
               <p>Open Time:</p>
               <p className="font-semibold text-foreground">{game.openTime}</p>
             </div>
-            <div>
-              <p>Close Time:</p>
-              <p className="font-semibold text-foreground">{game.closeTime}</p>
-            </div>
+            {closeTimeText}
           </div>
         </div>
         <div className="flex flex-col items-center justify-center text-center">
-          <p className="text-destructive text-xs font-semibold mb-2">Closed for today</p>
-          <Button variant="default" size="icon" className="h-12 w-12 rounded-full bg-primary mb-1">
+          {isOpen ? (
+            <p className="text-green-600 text-xs font-semibold mb-2">Open for biding</p>
+          ) : (
+            <p className="text-destructive text-xs font-semibold mb-2">Closed for today</p>
+          )}
+          <Button variant="default" size="icon" className="h-12 w-12 rounded-full bg-primary mb-1" disabled={!isOpen}>
             <Play className="h-6 w-6 fill-primary-foreground" />
           </Button>
           <p className="text-sm font-semibold">Play Game</p>
