@@ -13,6 +13,7 @@ const betTypes = [
     { id: 'double-patti', name: 'Double Patti', description: 'e.g. 112 (two same)' },
     { id: 'triple-patti', name: 'Triple Patti', description: 'e.g. 111 (all same)' },
     { id: 'half-sangam', name: 'Half Sangam', description: 'Patti + Jodi' },
+    { id: 'full-sangam', name: 'Full Sangam', description: 'Open Patti + Close Patti' },
 ]
 
 export default function PlayGamePage({ params }: { params: { gameId: string } }) {
