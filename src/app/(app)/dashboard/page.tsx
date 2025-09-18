@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { games } from "@/lib/data";
 import { Play, MessageSquare } from "lucide-react";
+import Link from "next/link";
 import { useEffect, useState } from "react";
 
 function GameCard({ game }: { game: typeof games[0] }) {
@@ -74,10 +75,12 @@ function GameCard({ game }: { game: typeof games[0] }) {
           ) : (
             <p className="text-destructive text-xs font-semibold mb-2">Closed for today</p>
           )}
-          <Button variant="default" size="icon" className="h-12 w-12 rounded-full bg-primary mb-1" disabled={!isOpen}>
-            <Play className="h-6 w-6 fill-primary-foreground" />
-          </Button>
-          <p className="text-sm font-semibold">Play Game</p>
+          <Link href={`/play/${game.id}`} className="flex flex-col items-center">
+            <Button variant="default" size="icon" className="h-12 w-12 rounded-full bg-primary mb-1" disabled={!isOpen}>
+              <Play className="h-6 w-6 fill-primary-foreground" />
+            </Button>
+            <p className="text-sm font-semibold">Play Game</p>
+          </Link>
         </div>
       </CardContent>
     </Card>
