@@ -6,6 +6,7 @@ import type { Game } from "@/lib/types";
 import { Play, MessageSquare, LineChart } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { getGames } from "@/app/actions/games";
 
 function GameCard({ game }: { game: Game }) {
   const [isOpen, setIsOpen] = useState(false);
@@ -104,8 +105,7 @@ export default function DashboardPage() {
 
     useEffect(() => {
         const fetchGames = async () => {
-            const response = await fetch('/api/games');
-            const data = await response.json();
+            const data = await getGames();
             setGames(data);
             setLoading(false);
         }
