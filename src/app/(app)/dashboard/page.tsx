@@ -105,7 +105,7 @@ export default function DashboardPage() {
         <p>Welcome --Welcome --Welcome</p>
       </div>
 
-      <div className="p-4">
+      <div className="py-4 px-2">
         <div className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
             <Button className="h-12 bg-primary rounded-full font-bold text-lg">
