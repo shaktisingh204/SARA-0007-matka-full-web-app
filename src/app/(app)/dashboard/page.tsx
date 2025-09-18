@@ -1,9 +1,29 @@
-import { StatsCard } from "@/components/dashboard/stats-card";
-import { RecentResults } from "@/components/dashboard/recent-results";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { DollarSign, Gamepad2, Gift, Target } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { ArrowDownCircle, ArrowUpCircle, MessageSquare, BookText } from "lucide-react";
 import Link from "next/link";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { games } from "@/lib/data";
+
+function ActionCard({ title, icon: Icon, href }: { title: string, icon: React.ElementType, href: string }) {
+  return (
+    <Link href={href}>
+      <Card className="hover:bg-accent hover:text-accent-foreground transition-colors">
+        <CardContent className="p-4 flex flex-col items-center justify-center text-center gap-2">
+          <Icon className="h-8 w-8 text-primary" />
+          <p className="font-semibold">{title}</p>
+        </CardContent>
+      </Card>
+    </Link>
+  );
+}
+
 
 export default function DashboardPage() {
   return (
@@ -15,28 +35,38 @@ export default function DashboardPage() {
         <p className="text-muted-foreground">Here's your daily Matka overview.</p>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <StatsCard title="Wallet Balance" value="₹1,250" icon={DollarSign} description="+20.1% from last month" />
-        <StatsCard title="Today's Games" value="8" icon={Gamepad2} description="All markets open" />
-        <StatsCard title="Winning Bets" value="3" icon={Gift} description="This week" />
-        <StatsCard title="Lucky Number" value="7" icon={Target} description="Most frequent this month" />
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <ActionCard title="Deposit" icon={ArrowDownCircle} href="/wallet" />
+        <ActionCard title="Withdraw" icon={ArrowUpCircle} href="/wallet" />
+        <ActionCard title="WhatsApp" icon={MessageSquare} href="#" />
+        <ActionCard title="How to Play" icon={BookText} href="/rules" />
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-2">
-        <RecentResults />
-        <Card className="flex flex-col items-center justify-center p-6 text-center">
-            <CardHeader>
-                <Target className="mx-auto h-12 w-12 text-primary" />
-                <CardTitle className="font-headline mt-4">Get Your Predictions</CardTitle>
-                <CardDescription>Use our AI to predict the next winning numbers.</CardDescription>
-            </CardHeader>
-            <CardContent>
-                <Link href="/predictions">
-                    <Button size="lg">Predict Now</Button>
-                </Link>
-            </CardContent>
-        </Card>
-      </div>
+      <Card>
+        <CardHeader>
+          <CardTitle className="font-headline">Game Markets</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Market Name</TableHead>
+                <TableHead className="text-right">Open Time</TableHead>
+                <TableHead className="text-right">Close Time</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {games.map((game) => (
+                <TableRow key={game.id}>
+                  <TableCell className="font-medium">{game.name}</TableCell>
+                  <TableCell className="text-right font-mono">{game.openTime}</TableCell>
+                  <TableCell className="text-right font-mono">{game.closeTime}</TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </CardContent>
+      </Card>
     </div>
   );
 }
