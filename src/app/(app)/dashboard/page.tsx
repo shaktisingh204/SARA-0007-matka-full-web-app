@@ -1,93 +1,75 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ArrowDownCircle, ArrowUpCircle, MessageSquare, BookText } from "lucide-react";
-import Link from "next/link";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
 import { games } from "@/lib/data";
-import { Carousel, CarouselContent, CarouselItem } from "@/components/ui/carousel";
-import Image from "next/image";
-import { PlaceHolderImages } from "@/lib/placeholder-images";
+import { Play, MessageSquare } from "lucide-react";
 
-
-function ActionCard({ title, icon: Icon, href }: { title: string, icon: React.ElementType, href: string }) {
+function GameCard({ game }: { game: typeof games[0] }) {
   return (
-    <Link href={href}>
-      <Card className="hover:bg-accent hover:text-accent-foreground transition-colors">
-        <CardContent className="p-4 flex flex-col items-center justify-center text-center gap-2">
-          <Icon className="h-8 w-8 text-primary" />
-          <p className="font-semibold">{title}</p>
-        </CardContent>
-      </Card>
-    </Link>
-  );
+    <Card>
+      <CardContent className="p-4 grid grid-cols-3 items-center gap-4">
+        <div className="col-span-2">
+          <h3 className="font-bold text-lg">{game.name}</h3>
+          <p className="text-primary font-bold text-lg tracking-widest">***-**-***</p>
+          <div className="flex justify-between text-xs text-muted-foreground">
+            <div>
+              <p>Open Time:</p>
+              <p className="font-semibold text-foreground">{game.openTime}</p>
+            </div>
+            <div>
+              <p>Close Time:</p>
+              <p className="font-semibold text-foreground">{game.closeTime}</p>
+            </div>
+          </div>
+        </div>
+        <div className="flex flex-col items-center justify-center text-center">
+          <p className="text-destructive text-xs font-semibold mb-2">Closed for today</p>
+          <Button variant="default" size="icon" className="h-12 w-12 rounded-full bg-primary mb-1">
+            <Play className="h-6 w-6 fill-primary-foreground" />
+          </Button>
+          <p className="text-sm font-semibold">Play Game</p>
+        </div>
+      </CardContent>
+    </Card>
+  )
 }
 
 
 export default function DashboardPage() {
   return (
-    <div className="flex flex-col gap-6">
-       <Carousel
-        opts={{
-          loop: true,
-        }}
-        className="w-full"
-      >
-        <CarouselContent>
-          {PlaceHolderImages.map((image) => (
-            <CarouselItem key={image.id}>
-              <div className="aspect-[2/1] overflow-hidden rounded-lg">
-                <Image
-                  src={image.imageUrl}
-                  alt={image.description}
-                  width={1200}
-                  height={600}
-                  className="object-cover w-full h-full"
-                  data-ai-hint={image.imageHint}
-                />
-              </div>
-            </CarouselItem>
-          ))}
-        </CarouselContent>
-      </Carousel>
-
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <ActionCard title="Deposit" icon={ArrowDownCircle} href="/wallet" />
-        <ActionCard title="Withdraw" icon={ArrowUpCircle} href="/wallet" />
-        <ActionCard title="WhatsApp" icon={MessageSquare} href="#" />
-        <ActionCard title="How to Play" icon={BookText} href="/rules" />
+    <div className="flex flex-col">
+      <div className="bg-white p-2 text-center text-destructive font-bold text-sm shadow-md">
+        <p>Welcome --Welcome --Welcome</p>
       </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle className="font-headline">Game Markets</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Market Name</TableHead>
-                <TableHead className="text-right">Open Time</TableHead>
-                <TableHead className="text-right">Close Time</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {games.map((game) => (
-                <TableRow key={game.id}>
-                  <TableCell className="font-medium">{game.name}</TableCell>
-                  <TableCell className="text-right font-mono">{game.openTime}</TableCell>
-                  <TableCell className="text-right font-mono">{game.closeTime}</TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </CardContent>
-      </Card>
+      <div className="p-4 space-y-4">
+        <div className="grid grid-cols-2 gap-4">
+          <Button className="h-12 bg-primary rounded-full font-bold text-lg">
+            <Play className="mr-2 h-6 w-6 fill-primary-foreground" />
+            MAIN STARLINE
+          </Button>
+          <Button className="h-12 bg-primary rounded-full font-bold text-lg">
+            <Play className="mr-2 h-6 w-6 fill-primary-foreground" />
+            MAIN JACKPOT
+          </Button>
+        </div>
+
+        <div className="flex justify-around bg-white p-2 rounded-lg shadow-sm">
+           <div className="flex items-center gap-2 text-green-600 font-bold">
+              <MessageSquare className="h-5 w-5 fill-green-600 text-white" />
+              <span>+919999999999</span>
+           </div>
+           <div className="flex items-center gap-2 text-green-600 font-bold">
+              <MessageSquare className="h-5 w-5 fill-green-600 text-white" />
+              <span>+919999999999</span>
+           </div>
+        </div>
+
+        <div className="space-y-3">
+          {games.map((game) => (
+            <GameCard key={game.id} game={game} />
+          ))}
+        </div>
+      </div>
     </div>
   );
 }
