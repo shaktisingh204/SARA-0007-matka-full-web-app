@@ -1,14 +1,14 @@
-import type { Game, Result, ChartData, Transaction, Bid } from '@/lib/types';
+import type { Game, Result, ChartData, Transaction, Bid, User } from '@/lib/types';
 
 export const games: Game[] = [
-  { id: 'milan_morning', name: 'Milan Morning', openTime: '10:15 AM', closeTime: '11:15 AM' },
-  { id: 'kalyan_morning', name: 'Kalyan Morning', openTime: '11:00 AM', closeTime: '12:00 PM' },
-  { id: 'madhuri', name: 'Madhuri', openTime: '11:45 AM', closeTime: '12:45 PM' },
-  { id: 'sridevi', name: 'Sridevi', openTime: '11:35 AM', closeTime: '12:35 PM' },
-  { id: 'kalyan', name: 'Kalyan', openTime: '03:45 PM', closeTime: '05:45 PM' },
-  { id: 'milan_night', name: 'Milan Night', openTime: '09:00 PM', closeTime: '11:00 PM' },
-  { id: 'rajdhani_night', name: 'Rajdhani Night', openTime: '09:25 PM', closeTime: '11:35 PM' },
-  { id: 'main_bazar', name: 'Main Bazar', openTime: '09:40 PM', closeTime: '12:05 AM' },
+  { id: 'milan_morning', name: 'Milan Morning', openTime: '10:15', closeTime: '11:15' },
+  { id: 'kalyan_morning', name: 'Kalyan Morning', openTime: '11:00', closeTime: '12:00' },
+  { id: 'madhuri', name: 'Madhuri', openTime: '11:45', closeTime: '12:45' },
+  { id: 'sridevi', name: 'Sridevi', openTime: '11:35', closeTime: '12:35' },
+  { id: 'kalyan', name: 'Kalyan', openTime: '15:45', closeTime: '17:45' },
+  { id: 'milan_night', name: 'Milan Night', openTime: '21:00', closeTime: '23:00' },
+  { id: 'rajdhani_night', name: 'Rajdhani Night', openTime: '21:25', closeTime: '23:35' },
+  { id: 'main_bazar', name: 'Main Bazar', openTime: '21:40', closeTime: '00:05' },
   { id: 'starline', name: 'Starline', openTime: '24 Hours', closeTime: '' },
   { id: 'dishawar', name: 'Dishawar', openTime: '24 Hours', closeTime: '' },
   { id: 'super_day', name: 'Super Day', openTime: '24 Hours', closeTime: '' },
@@ -50,4 +50,11 @@ export const bids: Bid[] = [
     { id: '5', gameName: 'Rajdhani Night', betType: 'Jodi', market: 'jodi', number: '91', amount: 50, date: '2024-07-27T21:30:00Z', status: 'Loss' },
     { id: '6', gameName: 'Kalyan', betType: 'Triple Patti', market: 'close', number: '777', amount: 5, date: '2024-07-27T16:00:00Z', status: 'Loss' },
     { id: '7', gameName: 'Kalyan', betType: 'Single (Ank)', market: 'open', number: '8', amount: 100, date: '2024-07-26T15:50:00Z', status: 'Win' },
+];
+
+export const users: User[] = [
+  { id: '1', name: 'John Doe', email: 'john@example.com', walletBalance: 1250.75, status: 'Active' },
+  { id: '2', name: 'Jane Smith', email: 'jane@example.com', walletBalance: 450.00, status: 'Active' },
+  { id: '3', name: 'Bob Johnson', email: 'bob@example.com', walletBalance: 0, status: 'Blocked' },
+  { id: '4', name: 'Alice Williams', email: 'alice@example.com', walletBalance: 3200.50, status: 'Active' },
 ];

@@ -41,3 +41,11 @@ export type Bid = {
   date: string;
   status: 'Win' | 'Loss' | 'Pending';
 };
+
+export type User = {
+    id: string;
+    name: string;
+    email: string;
+    walletBalance: number;
+    status: 'Active' | 'Blocked';
+};
