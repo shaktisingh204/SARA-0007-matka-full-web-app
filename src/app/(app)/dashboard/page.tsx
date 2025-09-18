@@ -10,6 +10,10 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { games } from "@/lib/data";
+import { Carousel, CarouselContent, CarouselItem } from "@/components/ui/carousel";
+import Image from "next/image";
+import { PlaceHolderImages } from "@/lib/placeholder-images";
+
 
 function ActionCard({ title, icon: Icon, href }: { title: string, icon: React.ElementType, href: string }) {
   return (
@@ -28,12 +32,29 @@ function ActionCard({ title, icon: Icon, href }: { title: string, icon: React.El
 export default function DashboardPage() {
   return (
     <div className="flex flex-col gap-6">
-      <div>
-        <h1 className="font-headline text-3xl font-bold tracking-tight">
-          Welcome Back!
-        </h1>
-        <p className="text-muted-foreground">Here's your daily Matka overview.</p>
-      </div>
+       <Carousel
+        opts={{
+          loop: true,
+        }}
+        className="w-full"
+      >
+        <CarouselContent>
+          {PlaceHolderImages.map((image) => (
+            <CarouselItem key={image.id}>
+              <div className="aspect-[2/1] overflow-hidden rounded-lg">
+                <Image
+                  src={image.imageUrl}
+                  alt={image.description}
+                  width={1200}
+                  height={600}
+                  className="object-cover w-full h-full"
+                  data-ai-hint={image.imageHint}
+                />
+              </div>
+            </CarouselItem>
+          ))}
+        </CarouselContent>
+      </Carousel>
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <ActionCard title="Deposit" icon={ArrowDownCircle} href="/wallet" />

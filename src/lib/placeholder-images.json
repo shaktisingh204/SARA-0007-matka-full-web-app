@@ -1,3 +1,22 @@
 {
-  "placeholderImages": []
+  "placeholderImages": [
+    {
+      "id": "carousel-1",
+      "description": "Matka game numbers and charts",
+      "imageUrl": "https://picsum.photos/seed/carousel1/1200/600",
+      "imageHint": "lottery numbers"
+    },
+    {
+      "id": "carousel-2",
+      "description": "Exciting game results announcement",
+      "imageUrl": "https://picsum.photos/seed/carousel2/1200/600",
+      "imageHint": "winning celebration"
+    },
+    {
+      "id": "carousel-3",
+      "description": "A display of winning cards or numbers",
+      "imageUrl": "https://picsum.photos/seed/carousel3/1200/600",
+      "imageHint": "playing cards"
+    }
+  ]
 }
