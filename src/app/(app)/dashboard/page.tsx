@@ -2,12 +2,12 @@
 'use client';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { games } from "@/lib/data";
+import type { Game } from "@/lib/types";
 import { Play, MessageSquare, LineChart } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
-function GameCard({ game }: { game: typeof games[0] }) {
+function GameCard({ game }: { game: Game }) {
   const [isOpen, setIsOpen] = useState(false);
 
   useEffect(() => {
@@ -99,6 +99,40 @@ function GameCard({ game }: { game: typeof games[0] }) {
 
 
 export default function DashboardPage() {
+    const [games, setGames] = useState<Game[]>([]);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const fetchGames = async () => {
+            const response = await fetch('/api/games');
+            const data = await response.json();
+            setGames(data);
+            setLoading(false);
+        }
+        fetchGames();
+    }, []);
+
+    if (loading) {
+        return (
+            <div className="p-4 space-y-3">
+                {[...Array(5)].map((_, i) => (
+                    <Card key={i}>
+                        <CardContent className="p-4">
+                            <div className="animate-pulse flex space-x-4">
+                                <div className="flex-1 space-y-3 py-1">
+                                    <div className="h-4 bg-muted rounded w-3/4"></div>
+                                    <div className="h-4 bg-muted rounded w-1/2"></div>
+                                    <div className="h-3 bg-muted rounded w-5/6"></div>
+                                </div>
+                                <div className="rounded-full bg-muted h-12 w-12"></div>
+                            </div>
+                        </CardContent>
+                    </Card>
+                ))}
+            </div>
+        )
+    }
+
   return (
     <div className="flex flex-col">
       <div className="bg-white p-2 text-center text-destructive font-bold text-sm shadow-md">
