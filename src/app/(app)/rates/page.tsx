@@ -35,7 +35,7 @@ export default function RatesPage() {
         </h1>
         <p className="text-muted-foreground">
           Payout rates for different game types.
-        p>
+        </p>
       </div>
 
       <Card>
