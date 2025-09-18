@@ -12,10 +12,58 @@ import { useToast } from '@/hooks/use-toast';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Trash2 } from 'lucide-react';
 
-const betTypes: { [key: string]: { name: string, description: string, min: number, max: number, minLength: number, maxLength: number } } = {
-    'single': { name: 'Single Digit', description: 'Enter a single digit from 0-9', min: 0, max: 9, minLength: 1, maxLength: 1 },
-    'jodi': { name: 'Jodi', description: 'Enter a two-digit number from 00-99', min: 0, max: 99, minLength: 2, maxLength: 2 },
-    'patti': { name: 'Patti / Panna', description: 'Enter a three-digit number from 000-999', min: 0, max: 999, minLength: 3, maxLength: 3 },
+const betTypes: { [key: string]: { name: string, description: string, minLength: number, maxLength: number, validation: (numStr: string) => boolean, validationMessage: string } } = {
+    'single': { 
+        name: 'Single Digit', 
+        description: 'Enter a single digit from 0-9', 
+        minLength: 1, 
+        maxLength: 1,
+        validation: (numStr) => /^\d$/.test(numStr),
+        validationMessage: 'Please enter a single digit (0-9).'
+    },
+    'jodi': { 
+        name: 'Jodi', 
+        description: 'Enter a two-digit number from 00-99', 
+        minLength: 2, 
+        maxLength: 2,
+        validation: (numStr) => /^\d{2}$/.test(numStr),
+        validationMessage: 'Please enter a two-digit number (00-99).'
+    },
+    'single-patti': { 
+        name: 'Single Patti', 
+        description: 'Enter a unique three-digit number', 
+        minLength: 3, 
+        maxLength: 3,
+        validation: (numStr) => {
+            if (!/^\d{3}$/.test(numStr)) return false;
+            const digits = numStr.split('');
+            return new Set(digits).size === 3;
+        },
+        validationMessage: 'Please enter a 3-digit number with all unique digits.'
+    },
+    'double-patti': { 
+        name: 'Double Patti', 
+        description: 'Enter a three-digit number with two same digits', 
+        minLength: 3, 
+        maxLength: 3,
+        validation: (numStr) => {
+            if (!/^\d{3}$/.test(numStr)) return false;
+            const digits = numStr.split('');
+            return new Set(digits).size === 2;
+        },
+        validationMessage: 'Please enter a 3-digit number with exactly two same digits.'
+    },
+    'triple-patti': { 
+        name: 'Triple Patti', 
+        description: 'Enter a three-digit number with all same digits', 
+        minLength: 3, 
+        maxLength: 3,
+        validation: (numStr) => {
+            if (!/^\d{3}$/.test(numStr)) return false;
+            return new Set(numStr.split('')).size === 1;
+        },
+        validationMessage: 'Please enter a 3-digit number with all same digits.'
+    },
 }
 
 type Bid = {
@@ -45,26 +93,21 @@ export default function PlaceBetPage() {
   }
   
   const validateAndAddBid = () => {
-    const num = parseInt(betNumber, 10);
     const amount = parseInt(betAmount, 10);
 
     // Basic validation
-    if (isNaN(num) || isNaN(amount)) {
-        toast({ title: "Invalid Input", description: "Please enter a valid number and amount.", variant: "destructive" });
+    if (!betNumber || !betAmount) {
+        toast({ title: "Invalid Input", description: "Please enter a number and amount.", variant: "destructive" });
         return;
     }
-    if (amount <= 0) {
-        toast({ title: "Invalid Amount", description: "Amount must be greater than zero.", variant: "destructive" });
+    if (isNaN(amount) || amount <= 0) {
+        toast({ title: "Invalid Amount", description: "Amount must be a positive number.", variant: "destructive" });
         return;
     }
 
     // Game rule validation
-    if (betNumber.length > betType.maxLength) {
-        toast({ title: "Invalid Number", description: `Number cannot be more than ${betType.maxLength} digits for ${betType.name}.`, variant: "destructive" });
-        return;
-    }
-     if (num < betType.min || num > betType.max) {
-        toast({ title: "Invalid Number", description: `Please enter a valid ${betType.name} (${betType.description}).`, variant: "destructive" });
+    if (!betType.validation(betNumber)) {
+        toast({ title: "Invalid Number", description: betType.validationMessage, variant: "destructive" });
         return;
     }
     
@@ -125,8 +168,6 @@ export default function PlaceBetPage() {
                 placeholder="Enter number" 
                 value={betNumber}
                 onChange={(e) => setBetNumber(e.target.value)}
-                minLength={betType.minLength}
-                maxLength={betType.maxLength}
             />
            </div>
            <div>

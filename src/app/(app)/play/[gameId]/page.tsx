@@ -8,7 +8,9 @@ import { ArrowRight } from 'lucide-react';
 const betTypes = [
     { id: 'single', name: 'Single Digit', description: '0-9' },
     { id: 'jodi', name: 'Jodi', description: '00-99' },
-    { id: 'patti', name: 'Patti / Panna', description: '000-999' },
+    { id: 'single-patti', name: 'Single Patti', description: 'e.g. 123 (all unique)' },
+    { id: 'double-patti', name: 'Double Patti', description: 'e.g. 112 (two same)' },
+    { id: 'triple-patti', name: 'Triple Patti', description: 'e.g. 111 (all same)' },
 ]
 
 export default function PlayGamePage({ params }: { params: { gameId: string } }) {
