@@ -105,33 +105,35 @@ export default function DashboardPage() {
         <p>Welcome --Welcome --Welcome</p>
       </div>
 
-      <div className="space-y-4 p-4">
-        <div className="grid grid-cols-2 gap-4">
-          <Button className="h-12 bg-primary rounded-full font-bold text-lg">
-            <Play className="mr-2 h-6 w-6 fill-primary-foreground" />
-            STARLINE
-          </Button>
-          <Button className="h-12 bg-primary rounded-full font-bold text-lg">
-            <Play className="mr-2 h-6 w-6 fill-primary-foreground" />
-            DISHAWAR
-          </Button>
-        </div>
+      <div className="p-4">
+        <div className="space-y-4">
+            <div className="grid grid-cols-2 gap-4">
+            <Button className="h-12 bg-primary rounded-full font-bold text-lg">
+                <Play className="mr-2 h-6 w-6 fill-primary-foreground" />
+                STARLINE
+            </Button>
+            <Button className="h-12 bg-primary rounded-full font-bold text-lg">
+                <Play className="mr-2 h-6 w-6 fill-primary-foreground" />
+                DISHAWAR
+            </Button>
+            </div>
 
-        <div className="flex justify-around bg-white p-2 rounded-lg shadow-sm">
-           <div className="flex items-center gap-2 text-green-600 font-bold">
-              <MessageSquare className="h-5 w-5 fill-green-600 text-white" />
-              <span>+919999999999</span>
-           </div>
-           <div className="flex items-center gap-2 text-green-600 font-bold">
-              <MessageSquare className="h-5 w-5 fill-green-600 text-white" />
-              <span>+919999999999</span>
-           </div>
-        </div>
+            <div className="flex justify-around bg-white p-2 rounded-lg shadow-sm">
+            <div className="flex items-center gap-2 text-green-600 font-bold">
+                <MessageSquare className="h-5 w-5 fill-green-600 text-white" />
+                <span>+919999999999</span>
+            </div>
+            <div className="flex items-center gap-2 text-green-600 font-bold">
+                <MessageSquare className="h-5 w-5 fill-green-600 text-white" />
+                <span>+919999999999</span>
+            </div>
+            </div>
 
-        <div className="space-y-3">
-          {games.map((game) => (
-            <GameCard key={game.id} game={game} />
-          ))}
+            <div className="space-y-3">
+            {games.map((game) => (
+                <GameCard key={game.id} game={game} />
+            ))}
+            </div>
         </div>
       </div>
     </div>

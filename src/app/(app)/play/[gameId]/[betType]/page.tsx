@@ -172,7 +172,7 @@ export default function PlaceBetPage() {
   }
   
   return (
-    <div className="p-4 space-y-4">
+    <div className="p-4 md:p-6 space-y-4">
       <Card>
         <CardHeader>
           <CardTitle className="font-headline text-2xl">{game.name}</CardTitle>

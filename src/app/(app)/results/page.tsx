@@ -1,8 +1,9 @@
+
 import { ResultsTabs } from "@/components/results/results-tabs";
 
 export default function ResultsPage() {
   return (
-    <div className="space-y-6">
+    <div className="p-4 md:p-6 space-y-6">
       <div>
         <h1 className="font-headline text-3xl font-bold tracking-tight">
           Game Results
