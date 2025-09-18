@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter }
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 
 const betTypes: { [key: string]: { name: string, description: string } } = {
     'single': { name: 'Single Digit', description: 'Enter a single digit from 0-9' },
@@ -19,6 +20,7 @@ export default function PlaceBetPage() {
 
   const game = games.find((g) => g.id === gameId);
   const betType = typeof betTypeParam === 'string' ? betTypes[betTypeParam] : undefined;
+  const isJodi = betTypeParam === 'jodi';
 
   if (!game || !betType) {
     notFound();
@@ -32,6 +34,21 @@ export default function PlaceBetPage() {
           <CardDescription>Placing Bet: <span className="font-semibold">{betType.name}</span></CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
+           {!isJodi && (
+             <div className="space-y-2">
+                <Label>Market</Label>
+                <RadioGroup defaultValue="open" className="flex gap-4">
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="open" id="open" />
+                    <Label htmlFor="open">Open</Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="close" id="close" />
+                    <Label htmlFor="close">Close</Label>
+                  </div>
+                </RadioGroup>
+            </div>
+           )}
            <div>
             <Label htmlFor="bet-number">{betType.description}</Label>
             <Input id="bet-number" type="number" placeholder="Enter number" />
