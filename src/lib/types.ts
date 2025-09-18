@@ -30,3 +30,14 @@ export type Transaction = {
   amount: number;
   balance: number;
 };
+
+export type Bid = {
+  id: string;
+  gameName: string;
+  betType: string;
+  market: 'open' | 'close' | 'jodi';
+  number: string;
+  amount: number;
+  date: string;
+  status: 'Win' | 'Loss' | 'Pending';
+};

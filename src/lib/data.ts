@@ -1,4 +1,4 @@
-import type { Game, Result, ChartData, Transaction } from '@/lib/types';
+import type { Game, Result, ChartData, Transaction, Bid } from '@/lib/types';
 
 export const games: Game[] = [
   { id: 'milan_morning', name: 'Milan Morning', openTime: '10:15 AM', closeTime: '11:15 AM' },
@@ -40,4 +40,14 @@ export const transactions: Transaction[] = [
   { id: '4', date: '2024-07-27', description: 'Withdrawal to bank account', type: 'debit', amount: 500.00, balance: -99.25 },
   { id: '5', date: '2024-07-26', description: 'Bet placed on Main Bazar', type: 'debit', amount: 50.00, balance: 400.75 },
   { id: '6', date: '2024-06-30', description: 'Deposit via Netbanking', type: 'credit', amount: 1000.00, balance: 450.75 },
+];
+
+export const bids: Bid[] = [
+    { id: '1', gameName: 'Kalyan', betType: 'Jodi', market: 'jodi', number: '28', amount: 10, date: '2024-07-29T10:30:00Z', status: 'Win' },
+    { id: '2', gameName: 'Milan Night', betType: 'Single (Ank)', market: 'open', number: '5', amount: 25, date: '2024-07-29T09:15:00Z', status: 'Loss' },
+    { id: '3', gameName: 'Main Bazar', betType: 'Single Patti', market: 'close', number: '123', amount: 10, date: '2024-07-28T22:00:00Z', status: 'Pending' },
+    { id: '4', gameName: 'Sridevi', betType: 'Double Patti', market: 'open', number: '447', amount: 15, date: '2024-07-28T11:40:00Z', status: 'Win' },
+    { id: '5', gameName: 'Rajdhani Night', betType: 'Jodi', market: 'jodi', number: '91', amount: 50, date: '2024-07-27T21:30:00Z', status: 'Loss' },
+    { id: '6', gameName: 'Kalyan', betType: 'Triple Patti', market: 'close', number: '777', amount: 5, date: '2024-07-27T16:00:00Z', status: 'Loss' },
+    { id: '7', gameName: 'Kalyan', betType: 'Single (Ank)', market: 'open', number: '8', amount: 100, date: '2024-07-26T15:50:00Z', status: 'Win' },
 ];
