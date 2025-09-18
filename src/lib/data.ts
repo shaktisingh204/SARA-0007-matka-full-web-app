@@ -1,4 +1,4 @@
-import type { Game, Result, ChartData } from '@/lib/types';
+import type { Game, Result, ChartData, Transaction } from '@/lib/types';
 
 export const games: Game[] = [
   { id: 'milan_morning', name: 'Milan Morning', openTime: '10:15 AM', closeTime: '11:15 AM' },
@@ -31,4 +31,13 @@ export const chartData: ChartData[] = [
     { date: "Fri", 'Open': 9, 'Close': 0 },
     { date: "Sat", 'Open': 1, 'Close': 3 },
     { date: "Sun", 'Open': 2, 'Close': 5 },
+];
+
+export const transactions: Transaction[] = [
+  { id: '1', date: '2024-07-29', description: 'Deposit via UPI', type: 'credit', amount: 500.00, balance: 1250.75 },
+  { id: '2', date: '2024-07-28', description: 'Bet placed on Kalyan (Jodi)', type: 'debit', amount: 100.00, balance: 750.75 },
+  { id: '3', date: '2024-07-28', description: 'Winnings from Milan Night', type: 'credit', amount: 950.00, balance: 850.75 },
+  { id: '4', date: '2024-07-27', description: 'Withdrawal to bank account', type: 'debit', amount: 500.00, balance: -99.25 },
+  { id: '5', date: '2024-07-26', description: 'Bet placed on Main Bazar', type: 'debit', amount: 50.00, balance: 400.75 },
+  { id: '6', date: '2024-06-30', description: 'Deposit via Netbanking', type: 'credit', amount: 1000.00, balance: 450.75 },
 ];

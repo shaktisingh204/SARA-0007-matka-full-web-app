@@ -21,3 +21,12 @@ export type ChartData = {
   date: string;
   [key: string]: number | string;
 };
+
+export type Transaction = {
+  id: string;
+  date: string;
+  description: string;
+  type: 'credit' | 'debit';
+  amount: number;
+  balance: number;
+};
