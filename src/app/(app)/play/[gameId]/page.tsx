@@ -1,17 +1,26 @@
 
+'use client';
 import { games } from '@/lib/data';
-import { notFound } from 'next/navigation';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { notFound, useRouter } from 'next/navigation';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { ArrowRight } from 'lucide-react';
+
+const betTypes = [
+    { id: 'single', name: 'Single Digit', description: '0-9' },
+    { id: 'jodi', name: 'Jodi', description: '00-99' },
+    { id: 'patti', name: 'Patti / Panna', description: '000-999' },
+]
 
 export default function PlayGamePage({ params }: { params: { gameId: string } }) {
+  const router = useRouter();
   const game = games.find((g) => g.id === params.gameId);
 
   if (!game) {
     notFound();
+  }
+
+  const handleBetTypeSelect = (betType: string) => {
+      router.push(`/play/${game.id}/${betType}`);
   }
 
   return (
@@ -19,80 +28,23 @@ export default function PlayGamePage({ params }: { params: { gameId: string } })
       <Card>
         <CardHeader>
           <CardTitle className="font-headline text-2xl">{game.name}</CardTitle>
-          <CardDescription>Place your bid below</CardDescription>
+          <CardDescription>Select a bet type to continue</CardDescription>
         </CardHeader>
       </Card>
 
-      <Tabs defaultValue="single" className="w-full">
-        <TabsList className="grid w-full grid-cols-3">
-            <TabsTrigger value="single">Single</TabsTrigger>
-            <TabsTrigger value="jodi">Jodi</TabsTrigger>
-            <TabsTrigger value="patti">Patti</TabsTrigger>
-        </TabsList>
-        <TabsContent value="single">
-            <Card>
-                <CardHeader>
-                    <CardTitle>Single Digit</CardTitle>
-                    <CardDescription>Enter a single digit from 0 to 9.</CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
+      <div className="space-y-3">
+        {betTypes.map((bet) => (
+            <Card key={bet.id} onClick={() => handleBetTypeSelect(bet.id)} className="cursor-pointer hover:bg-muted">
+                <CardContent className="p-4 flex justify-between items-center">
                     <div>
-                        <Label htmlFor="single-digit">Digit</Label>
-                        <Input id="single-digit" type="number" min="0" max="9" placeholder="e.g. 5" />
+                        <h3 className="font-bold text-lg">{bet.name}</h3>
+                        <p className="text-sm text-muted-foreground">{bet.description}</p>
                     </div>
-                    <div>
-                        <Label htmlFor="single-amount">Amount</Label>
-                        <Input id="single-amount" type="number" placeholder="Enter amount" />
-                    </div>
+                    <ArrowRight className="h-5 w-5 text-muted-foreground" />
                 </CardContent>
-                <CardFooter>
-                    <Button className="w-full">Submit Bid</Button>
-                </CardFooter>
             </Card>
-        </TabsContent>
-        <TabsContent value="jodi">
-             <Card>
-                <CardHeader>
-                    <CardTitle>Jodi</CardTitle>
-                    <CardDescription>Enter a two-digit number from 00 to 99.</CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                    <div>
-                        <Label htmlFor="jodi-digit">Jodi</Label>
-                        <Input id="jodi-digit" type="number" min="0" max="99" placeholder="e.g. 42" />
-                    </div>
-                    <div>
-                        <Label htmlFor="jodi-amount">Amount</Label>
-                        <Input id="jodi-amount" type="number" placeholder="Enter amount" />
-                    </div>
-                </CardContent>
-                <CardFooter>
-                    <Button className="w-full">Submit Bid</Button>
-                </CardFooter>
-            </Card>
-        </TabsContent>
-        <TabsContent value="patti">
-             <Card>
-                <CardHeader>
-                    <CardTitle>Patti / Panna</CardTitle>
-                    <CardDescription>Enter a three-digit number.</CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                    <div>
-                        <Label htmlFor="patti-digit">Patti</Label>
-                        <Input id="patti-digit" type="number" min="0" placeholder="e.g. 123" />
-                    </div>
-                    <div>
-                        <Label htmlFor="patti-amount">Amount</Label>
-                        <Input id="patti-amount" type="number" placeholder="Enter amount" />
-                    </div>
-                </CardContent>
-                <CardFooter>
-                    <Button className="w-full">Submit Bid</Button>
-                </CardFooter>
-            </Card>
-        </TabsContent>
-      </Tabs>
+        ))}
+      </div>
     </div>
   );
 }
