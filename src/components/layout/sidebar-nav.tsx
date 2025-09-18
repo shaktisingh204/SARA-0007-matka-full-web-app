@@ -16,6 +16,7 @@ import {
   BookText,
   Gavel,
   Book,
+  IndianRupee,
 } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -29,6 +30,7 @@ const navItems = [
   { href: '/results', label: 'Results', icon: ScrollText },
   { href: '/wallet', label: 'Wallet', icon: Wallet },
   { href: '/rules', label: 'How to Play', icon: BookText },
+  { href: '/rates', label: 'Game Rates', icon: IndianRupee },
 ];
 
 export function SidebarNav() {
