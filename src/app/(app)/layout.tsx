@@ -30,11 +30,13 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
           </SidebarContent>
           <SidebarRail />
         </Sidebar>
-        <div className="flex-1 flex flex-col">
-          <Header />
-          <main className="flex-1 pb-20 md:pb-0">
-             <div>{children}</div>
-          </main>
+        <div className="flex-1 flex flex-col items-center">
+          <div className="w-full max-w-4xl">
+            <Header />
+            <main className="flex-1 pb-20 md:pb-0">
+              <div>{children}</div>
+            </main>
+          </div>
           <BottomNav />
         </div>
       </div>
