@@ -12,6 +12,7 @@ import {
   LineChart,
   ScrollText,
   Wallet,
+  BookText,
 } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -22,6 +23,7 @@ const navItems = [
   { href: '/charts', label: 'Charts', icon: LineChart },
   { href: '/results', label: 'Results', icon: ScrollText },
   { href: '/wallet', label: 'Wallet', icon: Wallet },
+  { href: '/rules', label: 'How to Play', icon: BookText },
 ];
 
 export function SidebarNav() {
