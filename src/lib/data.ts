@@ -9,8 +9,8 @@ export const games: Game[] = [
   { id: 'milan_night', name: 'Milan Night', openTime: '09:00 PM', closeTime: '11:00 PM' },
   { id: 'rajdhani_night', name: 'Rajdhani Night', openTime: '09:25 PM', closeTime: '11:35 PM' },
   { id: 'main_bazar', name: 'Main Bazar', openTime: '09:40 PM', closeTime: '12:05 AM' },
-  { id: 'starline_ace', name: 'Starline Ace', openTime: '24 Hours', closeTime: '' },
-  { id: 'starline_king', name: 'Starline King', openTime: '24 Hours', closeTime: '' },
+  { id: 'starline', name: 'Starline', openTime: '24 Hours', closeTime: '' },
+  { id: 'dishawar', name: 'Dishawar', openTime: '24 Hours', closeTime: '' },
   { id: 'super_day', name: 'Super Day', openTime: '24 Hours', closeTime: '' },
 ];
 

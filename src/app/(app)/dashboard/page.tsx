@@ -45,11 +45,11 @@ export default function DashboardPage() {
         <div className="grid grid-cols-2 gap-4">
           <Button className="h-12 bg-primary rounded-full font-bold text-lg">
             <Play className="mr-2 h-6 w-6 fill-primary-foreground" />
-            MAIN STARLINE
+            STARLINE
           </Button>
           <Button className="h-12 bg-primary rounded-full font-bold text-lg">
             <Play className="mr-2 h-6 w-6 fill-primary-foreground" />
-            MAIN JACKPOT
+            DISHAWAR
           </Button>
         </div>
 
