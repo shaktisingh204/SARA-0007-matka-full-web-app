@@ -13,14 +13,6 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Trash2 } from 'lucide-react';
 
 const betTypes: { [key: string]: { name: string, description: string, minLength: number, maxLength: number, validation: (numStr: string) => boolean, validationMessage: string } } = {
-    'single': { 
-        name: 'Single Digit', 
-        description: 'Enter a single digit from 0-9', 
-        minLength: 1, 
-        maxLength: 1,
-        validation: (numStr) => /^\d$/.test(numStr),
-        validationMessage: 'Please enter a single digit (0-9).'
-    },
     'ank': {
         name: 'Single (Ank)',
         description: 'Enter a single digit from 0-9',
