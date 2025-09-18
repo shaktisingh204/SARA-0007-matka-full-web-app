@@ -29,6 +29,14 @@ const betTypes: { [key: string]: { name: string, description: string, minLength:
         validation: (numStr) => /^\d{2}$/.test(numStr),
         validationMessage: 'Please enter a two-digit number (00-99).'
     },
+    'patti': {
+        name: 'Patti / Panna',
+        description: 'Enter a three-digit number from 000-999',
+        minLength: 3,
+        maxLength: 3,
+        validation: (numStr) => /^\d{3}$/.test(numStr),
+        validationMessage: 'Please enter a three-digit number (000-999).'
+    },
     'single-patti': { 
         name: 'Single Patti', 
         description: 'Enter a unique three-digit number', 
