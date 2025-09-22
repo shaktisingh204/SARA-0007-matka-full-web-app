@@ -4,7 +4,7 @@
 import * as React from 'react';
 import { addDays, format } from 'date-fns';
 import type { DateRange } from 'react-day-picker';
-import { games, bids as allBids } from '@/lib/data';
+import { games } from '@/lib/data';
 import type { Bid } from '@/lib/types';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
@@ -19,13 +19,18 @@ import { Button } from '@/components/ui/button';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Calendar } from '@/components/ui/calendar';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Calendar as CalendarIcon, FilterX } from 'lucide-react';
+import { Calendar as CalendarIcon, FilterX, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
+import { getBids } from '@/app/actions/bids';
+import { useUser } from '@/hooks/use-user';
 
 const betStatuses = ['Win', 'Loss', 'Pending'];
 
 export function BidsHistoryClient() {
+  const { user } = useUser();
+  const [allBids, setAllBids] = React.useState<Bid[]>([]);
+  const [loading, setLoading] = React.useState(true);
   const [date, setDate] = React.useState<DateRange | undefined>({
     from: addDays(new Date(), -7),
     to: new Date(),
@@ -33,6 +38,18 @@ export function BidsHistoryClient() {
   const [selectedGame, setSelectedGame] = React.useState<string>('all');
   const [selectedStatus, setSelectedStatus] = React.useState<string>('all');
   const [filteredBids, setFilteredBids] = React.useState<Bid[]>([]);
+
+  React.useEffect(() => {
+    const fetchBids = async () => {
+      if (user) {
+        setLoading(true);
+        const userBids = await getBids(user.id);
+        setAllBids(userBids);
+        setLoading(false);
+      }
+    };
+    fetchBids();
+  }, [user]);
 
   const filterBids = React.useCallback(() => {
     const fromDate = date?.from ? new Date(date.from.setHours(0, 0, 0, 0)) : null;
@@ -47,7 +64,7 @@ export function BidsHistoryClient() {
       return isDateInRange && isGameMatch && isStatusMatch;
     });
     setFilteredBids(filtered);
-  }, [date, selectedGame, selectedStatus]);
+  }, [date, selectedGame, selectedStatus, allBids]);
 
   React.useEffect(() => {
     filterBids();
@@ -140,6 +157,11 @@ export function BidsHistoryClient() {
         </div>
       </CardHeader>
       <CardContent>
+        {loading ? (
+            <div className="flex justify-center items-center h-48">
+                <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+            </div>
+        ) : (
         <Table>
           <TableHeader>
             <TableRow>
@@ -177,6 +199,7 @@ export function BidsHistoryClient() {
             )}
           </TableBody>
         </Table>
+        )}
       </CardContent>
     </Card>
   );
