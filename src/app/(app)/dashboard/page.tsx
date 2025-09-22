@@ -7,6 +7,7 @@ import { Play, MessageSquare, LineChart } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { getGames } from "@/app/actions/games";
+import { useLogStore } from "@/lib/store";
 
 function GameCard({ game }: { game: Game }) {
   const [isOpen, setIsOpen] = useState(false);
@@ -102,16 +103,23 @@ function GameCard({ game }: { game: Game }) {
 export default function DashboardPage() {
     const [games, setGames] = useState<Game[]>([]);
     const [loading, setLoading] = useState(true);
+    const { addLog } = useLogStore();
 
     useEffect(() => {
         const fetchGames = async () => {
             setLoading(true);
-            const data = await getGames();
-            setGames(data);
+            const result = await getGames();
+            addLog({ title: 'getGames Response', data: result });
+            if (result.success && result.data) {
+                setGames(result.data);
+            } else {
+                console.error("Failed to fetch games:", result.error);
+                // Optionally set an error state to show in the UI
+            }
             setLoading(false);
         }
         fetchGames();
-    }, []);
+    }, [addLog]);
 
     if (loading) {
         return (

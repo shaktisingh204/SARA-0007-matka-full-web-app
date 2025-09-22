@@ -23,6 +23,33 @@ type AppActions = {
   setSheetOpen: (isOpen: boolean) => void;
 };
 
+// --- API Logger Store ---
+type LogEntry = {
+  title: string;
+  data: any;
+};
+
+type LogState = {
+  logs: LogEntry[];
+  isOpen: boolean;
+};
+
+type LogActions = {
+  addLog: (log: LogEntry) => void;
+  clearLogs: () => void;
+  toggle: () => void;
+};
+
+export const useLogStore = create<LogState & LogActions>((set) => ({
+  logs: [],
+  isOpen: false,
+  addLog: (log) => set((state) => ({ logs: [log, ...state.logs] })),
+  clearLogs: () => set({ logs: [] }),
+  toggle: () => set((state) => ({ isOpen: !state.isOpen })),
+}));
+// -----------------------
+
+
 export const useAppStore = create<AppState & AppActions>((set) => ({
   isSheetOpen: false,
   toggleSheet: () => set((state) => ({ isSheetOpen: !state.isSheetOpen })),

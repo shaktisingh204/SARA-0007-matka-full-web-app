@@ -8,6 +8,7 @@ import { Header } from '@/components/layout/header';
 import { BottomNav } from '@/components/layout/bottom-nav';
 import { BottomSheetNav } from '@/components/layout/bottom-sheet-nav';
 import { Loader2 } from 'lucide-react';
+import { ApiLogger } from '@/components/debug/api-logger';
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
@@ -21,23 +22,23 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     // Check if the auth state has been determined (it might take a moment for the persisted state to load)
     const hasHydrated = useAuthStore.persist.hasHydrated();
 
+    const checkAuth = () => {
+      const state = useAuthStore.getState();
+      if (!state.isAuthenticated) {
+        router.push('/login');
+      } else {
+        setIsCheckingAuth(false);
+      }
+    };
+
     if (!hasHydrated) {
         const unsubscribe = useAuthStore.persist.onFinishHydration(() => {
-            const freshState = useAuthStore.getState();
-            if (!freshState.isAuthenticated) {
-                router.push('/login');
-            } else {
-                setIsCheckingAuth(false);
-            }
+            checkAuth();
         });
         return unsubscribe;
     }
 
-    if (!isAuthenticated) {
-      router.push('/login');
-    } else {
-      setIsCheckingAuth(false);
-    }
+    checkAuth();
   }, [isAuthenticated, router]);
 
   if (isCheckingAuth) {
@@ -56,6 +57,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
       </main>
       <BottomSheetNav />
       <BottomNav />
+      <ApiLogger />
     </div>
   );
 }
