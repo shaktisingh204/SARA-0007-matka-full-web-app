@@ -24,6 +24,10 @@ export async function signupUser(values: z.infer<typeof signupSchema>) {
     return { error: 'Invalid fields.' };
   }
 
+  if (!API_BASE_URL) {
+    return { error: 'API endpoint is not configured.' };
+  }
+
   try {
     const response = await fetch(`${API_BASE_URL}/signup`, {
       method: 'POST',
@@ -41,6 +45,7 @@ export async function signupUser(values: z.infer<typeof signupSchema>) {
       return { error: data.message || 'Signup failed.' };
     }
   } catch (error) {
+    console.error('Signup Error:', error);
     return { error: 'An unexpected error occurred.' };
   }
 }
@@ -52,6 +57,10 @@ export async function loginUser(values: z.infer<typeof loginSchema>) {
     return { error: 'Invalid fields.' };
   }
   
+  if (!API_BASE_URL) {
+    return { error: 'API endpoint is not configured.' };
+  }
+
   try {
     const response = await fetch(`${API_BASE_URL}/login`, {
         method: 'POST',
@@ -69,6 +78,7 @@ export async function loginUser(values: z.infer<typeof loginSchema>) {
         return { error: data.message || 'Login failed.' };
     }
   } catch (error) {
+      console.error('Login Error:', error);
       return { error: 'An unexpected error occurred.' };
   }
 }
