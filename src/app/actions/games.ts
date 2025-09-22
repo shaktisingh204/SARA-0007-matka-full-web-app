@@ -4,6 +4,7 @@
 import type { Game } from '@/lib/types';
 import { games as mockGames } from '@/lib/data';
 import { cookies } from 'next/headers';
+import { useAuthStore } from '@/lib/store';
 
 type ApiResult = {
   success: boolean;
@@ -31,9 +32,11 @@ export async function getGames(): Promise<ApiResult> {
   
   const cookieStore = cookies();
   const authCookie = cookieStore.get('auth-storage');
+  
   if (!authCookie) {
     return { success: false, error: 'User not authenticated.' };
   }
+
   const { state } = JSON.parse(authCookie.value);
   const token = state.token;
 
