@@ -7,6 +7,7 @@ import { Play, MessageSquare, LineChart } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { getGames } from "@/app/actions/games";
+import { getAppDetails } from "@/app/actions/app-details";
 import { useLogStore } from "@/lib/store";
 
 function GameCard({ game }: { game: Game }) {
@@ -102,23 +103,38 @@ function GameCard({ game }: { game: Game }) {
 
 export default function DashboardPage() {
     const [games, setGames] = useState<Game[]>([]);
+    const [appDetails, setAppDetails] = useState<{ whatsapp_no?: string, mobile_no?: string } | null>(null);
     const [loading, setLoading] = useState(true);
     const { addLog } = useLogStore();
 
     useEffect(() => {
         const fetchGames = async () => {
-            setLoading(true);
             const result = await getGames();
             addLog({ title: 'getGames Response', data: result });
             if (result.success && result.data) {
                 setGames(result.data);
             } else {
                 console.error("Failed to fetch games:", result.error);
-                // Optionally set an error state to show in the UI
             }
+        };
+
+        const fetchAppDetails = async () => {
+             const result = await getAppDetails();
+             addLog({ title: 'getAppDetails Response', data: result });
+             if (result.success && result.data) {
+                setAppDetails(result.data);
+             } else {
+                 console.error("Failed to fetch app details:", result.error);
+             }
+        };
+        
+        const loadData = async () => {
+            setLoading(true);
+            await Promise.all([fetchGames(), fetchAppDetails()]);
             setLoading(false);
         }
-        fetchGames();
+
+        loadData();
     }, [addLog]);
 
     if (loading) {
@@ -164,11 +180,11 @@ export default function DashboardPage() {
             <div className="flex justify-around bg-white p-2 rounded-lg shadow-sm">
             <div className="flex items-center gap-2 text-green-600 font-bold">
                 <MessageSquare className="h-5 w-5 fill-green-600 text-white" />
-                <span>+919999999999</span>
+                <span>{appDetails?.whatsapp_no || 'Loading...'}</span>
             </div>
             <div className="flex items-center gap-2 text-green-600 font-bold">
                 <MessageSquare className="h-5 w-5 fill-green-600 text-white" />
-                <span>+919999999999</span>
+                <span>{appDetails?.mobile_no || 'Loading...'}</span>
             </div>
             </div>
 

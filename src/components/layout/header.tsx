@@ -3,16 +3,34 @@
 
 import { Button } from '@/components/ui/button';
 import { Bell, Wallet2, Menu, LogOut } from 'lucide-react';
-import { useAppStore, useAuthStore } from '@/lib/store';
+import { useAppStore, useAuthStore, useUserProfileStore } from '@/lib/store';
 import { useRouter } from 'next/navigation';
+import { useEffect } from 'react';
+import { getUserDetails } from '@/app/actions/user';
 
 export function Header() {
   const { toggleSheet } = useAppStore();
   const { isAuthenticated, logout } = useAuthStore();
+  const { userProfile, setUserProfile, clearUserProfile } = useUserProfileStore();
   const router = useRouter();
+
+  useEffect(() => {
+    async function fetchUserDetails() {
+      if (isAuthenticated && !userProfile) {
+        const result = await getUserDetails();
+        if (result.success && result.data) {
+          setUserProfile(result.data);
+        } else {
+          console.error('Failed to fetch user details:', result.error);
+        }
+      }
+    }
+    fetchUserDetails();
+  }, [isAuthenticated, userProfile, setUserProfile]);
 
   const handleLogout = () => {
     logout();
+    clearUserProfile();
     router.push('/login');
   };
   
@@ -30,7 +48,7 @@ export function Header() {
            <>
             <Button variant="ghost" size="icon">
               <Wallet2 className="h-5 w-5" />
-              <span className="ml-1 font-bold text-sm">...</span>
+              <span className="ml-1 font-bold text-sm">{userProfile?.wallet_balance || '...'}</span>
             </Button>
             <Button variant="ghost" size="icon">
               <Bell className="h-5 w-5" />

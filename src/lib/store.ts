@@ -49,6 +49,42 @@ export const useLogStore = create<LogState & LogActions>((set) => ({
 }));
 // -----------------------
 
+// --- User Profile Store ---
+export type UserProfile = {
+  id: string;
+  name: string;
+  mobile: string;
+  wallet_balance: string;
+  bank_details_status: string;
+  gpay_status: string;
+  phonepe_status: string;
+  paytm_status: string;
+};
+
+type UserProfileState = {
+  userProfile: UserProfile | null;
+};
+
+type UserProfileActions = {
+  setUserProfile: (profile: UserProfile) => void;
+  clearUserProfile: () => void;
+};
+
+export const useUserProfileStore = create(
+  persist<UserProfileState & UserProfileActions>(
+    (set) => ({
+      userProfile: null,
+      setUserProfile: (profile) => set({ userProfile: profile }),
+      clearUserProfile: () => set({ userProfile: null }),
+    }),
+    {
+      name: 'user-profile-storage', 
+      storage: createJSONStorage(() => sessionStorage), 
+    }
+  )
+);
+// --------------------------
+
 
 export const useAppStore = create<AppState & AppActions>((set) => ({
   isSheetOpen: false,

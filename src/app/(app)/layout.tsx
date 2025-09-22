@@ -1,7 +1,7 @@
 
 'use client';
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/lib/store';
 import { Header } from '@/components/layout/header';
@@ -16,7 +16,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   
   // This state is necessary to avoid rendering children before the auth check is complete.
   // It also helps prevent a flash of the login page on a page reload for authenticated users.
-  const [isCheckingAuth, setIsCheckingAuth] = React.useState(true);
+  const [isCheckingAuth, setIsCheckingAuth] = useState(true);
 
   useEffect(() => {
     // Check if the auth state has been determined (it might take a moment for the persisted state to load)
@@ -35,7 +35,9 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         const unsubscribe = useAuthStore.persist.onFinishHydration(() => {
             checkAuth();
         });
-        return unsubscribe;
+        return () => { 
+            if (unsubscribe) unsubscribe();
+        };
     }
 
     checkAuth();
