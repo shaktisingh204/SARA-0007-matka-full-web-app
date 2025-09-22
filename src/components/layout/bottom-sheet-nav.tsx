@@ -7,7 +7,7 @@ import {
   SheetHeader,
   SheetTitle,
 } from '@/components/ui/sheet';
-import { useStore } from '@/lib/store';
+import { useAppStore } from '@/lib/store';
 import {
   Target,
   LineChart,
@@ -33,7 +33,7 @@ const navItems = [
 ];
 
 export function BottomSheetNav() {
-  const { isSheetOpen, setSheetOpen } = useStore();
+  const { isSheetOpen, setSheetOpen } = useAppStore();
 
   return (
     <Sheet open={isSheetOpen} onOpenChange={setSheetOpen}>

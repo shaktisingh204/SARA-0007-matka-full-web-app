@@ -2,11 +2,19 @@
 'use client';
 
 import { Button } from '@/components/ui/button';
-import { Bell, Wallet2, Menu } from 'lucide-react';
-import { useStore } from '@/lib/store';
+import { Bell, Wallet2, Menu, LogOut } from 'lucide-react';
+import { useAppStore, useAuthStore } from '@/lib/store';
+import { useRouter } from 'next/navigation';
 
 export function Header() {
-  const { toggleSheet } = useStore();
+  const { toggleSheet } = useAppStore();
+  const { isAuthenticated, logout } = useAuthStore();
+  const router = useRouter();
+
+  const handleLogout = () => {
+    logout();
+    router.push('/login');
+  };
   
   return (
     <header className="sticky top-0 z-10 flex h-16 items-center justify-between gap-4 border-b bg-background px-4 md:px-6">
@@ -18,14 +26,22 @@ export function Header() {
       </div>
 
       <div className="flex items-center gap-2">
-        <Button variant="ghost" size="icon">
-          <Wallet2 className="h-5 w-5" />
-          <span className="ml-1 font-bold text-sm">4264</span>
-        </Button>
-        <Button variant="ghost" size="icon">
-          <Bell className="h-5 w-5" />
-          <span className="sr-only">Notifications</span>
-        </Button>
+        {isAuthenticated && (
+           <>
+            <Button variant="ghost" size="icon">
+              <Wallet2 className="h-5 w-5" />
+              <span className="ml-1 font-bold text-sm">...</span>
+            </Button>
+            <Button variant="ghost" size="icon">
+              <Bell className="h-5 w-5" />
+              <span className="sr-only">Notifications</span>
+            </Button>
+             <Button variant="ghost" size="icon" onClick={handleLogout}>
+              <LogOut className="h-5 w-5" />
+              <span className="sr-only">Logout</span>
+            </Button>
+          </>
+        )}
         <Button variant="ghost" size="icon" onClick={toggleSheet}>
           <Menu className="h-6 w-6" />
           <span className="sr-only">Open Menu</span>
