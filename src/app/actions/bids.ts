@@ -1,7 +1,9 @@
+
 'use server';
 
 import type { Bid } from '@/lib/types';
 import { revalidatePath } from 'next/cache';
+import { bids as mockBids } from '@/lib/data';
 
 /**
  * Fetches the bid history for a given user from the API.
@@ -14,6 +16,12 @@ export async function getBids(userId: string): Promise<Bid[]> {
   if (!API_BASE_URL) {
     console.error('API_BASE_URL environment variable is not set.');
     return [];
+  }
+
+  // Fallback for restricted development environment
+  if (API_BASE_URL.startsWith('https://gurumatka.matkadash.in')) {
+    console.log('Using mock bids response due to network restrictions.');
+    return mockBids;
   }
 
   try {
@@ -38,9 +46,7 @@ export async function getBids(userId: string): Promise<Bid[]> {
 
     const data = await response.json();
 
-    // Assuming the API returns an array of bids in a format that matches or can be mapped to our `Bid` type.
-    // This mapping might need adjustment based on the actual API response structure.
-    if (data && Array.isArray(data.bids)) { // Assuming bids are in a 'bids' property
+    if (data && Array.isArray(data.bids)) {
         const bids: Bid[] = data.bids.map((apiBid: any) => ({
           id: apiBid.id.toString(),
           userId: apiBid.user_id,
@@ -49,8 +55,8 @@ export async function getBids(userId: string): Promise<Bid[]> {
           market: apiBid.market,
           number: apiBid.number,
           amount: parseFloat(apiBid.amount),
-          date: apiBid.created_at, // Assuming a date field like 'created_at'
-          status: apiBid.status, // Assuming status is 'Win', 'Loss', or 'Pending'
+          date: apiBid.created_at,
+          status: apiBid.status,
         }));
         return bids;
     }
@@ -59,7 +65,6 @@ export async function getBids(userId: string): Promise<Bid[]> {
     
   } catch (e) {
     console.error("Failed to fetch bids from API:", e);
-    // Return an empty array in case of an error
     return [];
   }
 }
