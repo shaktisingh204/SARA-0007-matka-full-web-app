@@ -28,9 +28,20 @@ const betTypeValidations: { [key: string]: (numStr: string) => boolean } = {
     'ank': (numStr) => /^\d$/.test(numStr),
     'jodi': (numStr) => /^\d{2}$/.test(numStr),
     'patti': (numStr) => /^\d{3}$/.test(numStr),
-    'single-patti': (numStr) => /^\d{3}$/.test(numStr) && new Set(numStr.split('')).size === 3,
-    'double-patti': (numStr) => /^\d{3}$/.test(numStr) && new Set(numStr.split('')).size === 2,
-    'triple-patti': (numStr) => /^\d{3}$/.test(numStr) && new Set(numStr.split('')).size === 1,
+    'single-patti': (numStr) => {
+        if (!/^\d{3}$/.test(numStr)) return false;
+        const digits = numStr.split('');
+        return new Set(digits).size === 3;
+    },
+    'double-patti': (numStr) => {
+        if (!/^\d{3}$/.test(numStr)) return false;
+        const digits = numStr.split('');
+        return new Set(digits).size === 2;
+    },
+    'triple-patti': (numStr) => {
+        if (!/^\d{3}$/.test(numStr)) return false;
+        return new Set(numStr.split('')).size === 1;
+    },
 };
 
 type SubmitBetsState = {
