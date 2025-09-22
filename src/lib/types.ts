@@ -33,7 +33,7 @@ export type Transaction = {
 
 export type Bid = {
   id: string;
-  userId: string; // Add userId to the type definition
+  userId?: string;
   gameName: string;
   betType: string;
   market: 'open' | 'close' | 'jodi';
