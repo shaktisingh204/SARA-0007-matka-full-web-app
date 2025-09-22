@@ -1,6 +1,8 @@
 
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
+import Cookies from 'js-cookie';
+import { StateStorage } from 'zustand/middleware';
 
 type AuthState = {
   token: string | null;
@@ -27,6 +29,18 @@ export const useAppStore = create<AppState & AppActions>((set) => ({
   setSheetOpen: (isOpen) => set({ isSheetOpen: isOpen }),
 }));
 
+const cookieStorage: StateStorage = {
+  getItem: (name: string): string | null => {
+    return Cookies.get(name) || null;
+  },
+  setItem: (name: string, value: string): void => {
+    Cookies.set(name, value, { expires: 7, path: '/' });
+  },
+  removeItem: (name: string): void => {
+    Cookies.remove(name);
+  },
+}
+
 export const useAuthStore = create(
   persist<AuthState & AuthActions>(
     (set) => ({
@@ -37,7 +51,7 @@ export const useAuthStore = create(
     }),
     {
       name: 'auth-storage', // name of the item in the storage (must be unique)
-      storage: createJSONStorage(() => localStorage), // (optional) by default, 'localStorage' is used
+      storage: createJSONStorage(() => cookieStorage), 
     }
   )
 );
