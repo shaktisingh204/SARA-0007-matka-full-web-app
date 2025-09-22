@@ -1,8 +1,8 @@
 export type Game = {
   id: string;
   name: string;
-  openTime: string;
-  closeTime: string;
+  open_time: string;
+  close_time: string;
 };
 
 export type Result = {

@@ -13,15 +13,15 @@ function GameCard({ game }: { game: Game }) {
   const [isOpen, setIsOpen] = useState(false);
 
   useEffect(() => {
-    if (game.openTime === '24 Hours') {
+    if (game.open_time === '24 Hours') {
       setIsOpen(true);
       return;
     }
 
     const checkStatus = () => {
       const now = new Date();
-      const [openHour, openMinute] = game.openTime.split(':').map(Number);
-      const [closeHour, closeMinute] = game.closeTime.split(':').map(Number);
+      const [openHour, openMinute] = game.open_time.split(':').map(Number);
+      const [closeHour, closeMinute] = game.close_time.split(':').map(Number);
       
       const openTime = new Date();
       openTime.setHours(openHour, openMinute, 0);
@@ -48,12 +48,12 @@ function GameCard({ game }: { game: Game }) {
     const interval = setInterval(checkStatus, 60000); // Check every minute
     return () => clearInterval(interval);
 
-  }, [game.openTime, game.closeTime]);
+  }, [game.open_time, game.close_time]);
 
-  const closeTimeText = game.closeTime ? (
+  const closeTimeText = game.close_time ? (
     <div>
       <p>Close Time:</p>
-      <p className="font-semibold text-foreground">{game.closeTime}</p>
+      <p className="font-semibold text-foreground">{game.close_time}</p>
     </div>
   ) : null;
 
@@ -66,7 +66,7 @@ function GameCard({ game }: { game: Game }) {
           <div className="flex justify-between text-xs text-muted-foreground">
             <div>
               <p>Open Time:</p>
-              <p className="font-semibold text-foreground">{game.openTime}</p>
+              <p className="font-semibold text-foreground">{game.open_time}</p>
             </div>
             {closeTimeText}
           </div>
