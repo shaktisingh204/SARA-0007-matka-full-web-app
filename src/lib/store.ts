@@ -6,12 +6,10 @@ import { StateStorage } from 'zustand/middleware';
 
 type AuthState = {
   token: string | null;
-  isAuthenticated: boolean;
 };
 
 type AuthActions = {
   setToken: (token: string) => void;
-  logout: () => void;
 };
 
 type AppState = {
@@ -108,9 +106,7 @@ export const useAuthStore = create(
   persist<AuthState & AuthActions>(
     (set) => ({
       token: null,
-      isAuthenticated: false,
-      setToken: (token: string) => set({ token, isAuthenticated: true }),
-      logout: () => set({ token: null, isAuthenticated: false }),
+      setToken: (token: string) => set({ token }),
     }),
     {
       name: 'auth-storage', // name of the item in the storage (must be unique)

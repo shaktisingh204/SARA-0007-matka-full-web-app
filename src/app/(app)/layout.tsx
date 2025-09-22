@@ -1,4 +1,4 @@
-
+// src/app/(app)/layout.tsx
 'use client';
 
 import React, { useEffect, useState } from 'react';
@@ -11,37 +11,22 @@ import { Loader2 } from 'lucide-react';
 import { ApiLogger } from '@/components/debug/api-logger';
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
-  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
   const router = useRouter();
-  
-  // This state is necessary to avoid rendering children before the auth check is complete.
-  // It also helps prevent a flash of the login page on a page reload for authenticated users.
+  const token = useAuthStore((state) => state.token);
   const [isCheckingAuth, setIsCheckingAuth] = useState(true);
 
   useEffect(() => {
-    // Check if the auth state has been determined (it might take a moment for the persisted state to load)
-    const hasHydrated = useAuthStore.persist.hasHydrated();
+    // This effect runs on the client after hydration.
+    // We check if the token (which is synced from cookies by the store) exists.
+    // If not, we redirect to login.
+    const isAuthenticated = !!useAuthStore.getState().token;
 
-    const checkAuth = () => {
-      const state = useAuthStore.getState();
-      if (!state.isAuthenticated) {
-        router.push('/login');
-      } else {
-        setIsCheckingAuth(false);
-      }
-    };
-
-    if (!hasHydrated) {
-        const unsubscribe = useAuthStore.persist.onFinishHydration(() => {
-            checkAuth();
-        });
-        return () => { 
-            if (unsubscribe) unsubscribe();
-        };
+    if (!isAuthenticated) {
+      router.push('/login');
+    } else {
+      setIsCheckingAuth(false);
     }
-
-    checkAuth();
-  }, [isAuthenticated, router]);
+  }, [router]);
 
   if (isCheckingAuth) {
     return (
