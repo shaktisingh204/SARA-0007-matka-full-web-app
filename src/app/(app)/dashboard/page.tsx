@@ -13,7 +13,7 @@ function GameCard({ game }: { game: Game }) {
   const [isOpen, setIsOpen] = useState(false);
 
   useEffect(() => {
-    if (game.open_time === '24 Hours') {
+    if (game.open_time === '24 Hours' || !game.close_time) {
       setIsOpen(true);
       return;
     }
