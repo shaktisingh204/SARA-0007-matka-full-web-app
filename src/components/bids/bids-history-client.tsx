@@ -43,6 +43,7 @@ export function BidsHistoryClient() {
     const fetchBids = async () => {
       if (user) {
         setLoading(true);
+        // Using the server action to fetch bids from the API
         const userBids = await getBids(user.id);
         setAllBids(userBids);
         setLoading(false);
