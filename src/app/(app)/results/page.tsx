@@ -1,4 +1,5 @@
 
+
 import { ResultsTabs } from "@/components/results/results-tabs";
 
 export default function ResultsPage() {

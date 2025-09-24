@@ -1,4 +1,5 @@
 
+
 import { PredictionClient } from "@/components/predictions/prediction-client";
 
 export default function PredictionsPage() {

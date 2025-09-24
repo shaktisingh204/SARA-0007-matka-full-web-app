@@ -97,5 +97,8 @@ export const useAuthStore = create<AuthState & AuthActions>((set) => ({
     token: null,
     isAuthenticated: false,
     setToken: (token) => set({ token, isAuthenticated: true }),
-    logout: () => set({ token: null, isAuthenticated: false }),
+    logout: () => {
+      Cookies.remove('auth_token');
+      set({ token: null, isAuthenticated: false })
+    },
 }));

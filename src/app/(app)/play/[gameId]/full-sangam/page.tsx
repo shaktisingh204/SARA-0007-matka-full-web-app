@@ -1,4 +1,5 @@
 
+
 'use client';
 import { games } from '@/lib/data';
 import { notFound, useParams } from 'next/navigation';

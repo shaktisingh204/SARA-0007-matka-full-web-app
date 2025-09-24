@@ -9,26 +9,28 @@ import { BottomNav } from '@/components/layout/bottom-nav';
 import { BottomSheetNav } from '@/components/layout/bottom-sheet-nav';
 import { Loader2 } from 'lucide-react';
 import { ApiLogger } from '@/components/debug/api-logger';
+import Cookies from 'js-cookie';
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
-  const token = useAuthStore((state) => state.token);
+  const { setToken, isAuthenticated } = useAuthStore();
   const [isCheckingAuth, setIsCheckingAuth] = useState(true);
 
   useEffect(() => {
-    // This effect runs on the client after hydration.
-    // We check if the token (which is synced from cookies by the store) exists.
-    // If not, we redirect to login.
-    const isAuthenticated = !!useAuthStore.getState().token;
-
-    if (!isAuthenticated) {
-      router.push('/login');
-    } else {
-      setIsCheckingAuth(false);
+    const token = Cookies.get('auth_token');
+    if (token) {
+      setToken(token);
     }
-  }, [router]);
+    setIsCheckingAuth(false);
+  }, [setToken]);
+  
+  useEffect(() => {
+    if (!isCheckingAuth && !isAuthenticated) {
+      router.push('/login');
+    }
+  }, [isCheckingAuth, isAuthenticated, router]);
 
-  if (isCheckingAuth) {
+  if (isCheckingAuth || !isAuthenticated) {
     return (
       <div className="flex min-h-screen items-center justify-center">
         <Loader2 className="h-8 w-8 animate-spin" />
