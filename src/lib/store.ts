@@ -6,7 +6,6 @@ import { StateStorage } from 'zustand/middleware';
 
 type AuthState = {
   token: string | null;
-  isAuthenticated: boolean;
 };
 
 type AuthActions = {
@@ -95,10 +94,9 @@ export const useAppStore = create<AppState & AppActions>((set) => ({
 
 export const useAuthStore = create<AuthState & AuthActions>((set) => ({
     token: null,
-    isAuthenticated: false,
-    setToken: (token) => set({ token, isAuthenticated: true }),
+    setToken: (token) => set({ token }),
     logout: () => {
       Cookies.remove('auth_token');
-      set({ token: null, isAuthenticated: false })
+      set({ token: null })
     },
 }));

@@ -3,12 +3,14 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import type { Game } from "@/lib/types";
-import { Play, MessageSquare, LineChart } from "lucide-react";
+import { Play, MessageSquare, LineChart, Loader2 } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { getGames } from "@/app/actions/games";
 import { getAppDetails } from "@/app/actions/app-details";
-import { useLogStore } from "@/lib/store";
+import { useLogStore, useAuthStore } from "@/lib/store";
+import { useRouter } from "next/navigation";
+import Cookies from "js-cookie";
 
 function GameCard({ game }: { game: Game }) {
   const [isOpen, setIsOpen] = useState(false);
@@ -102,40 +104,67 @@ function GameCard({ game }: { game: Game }) {
 
 
 export default function DashboardPage() {
+    const router = useRouter();
     const [games, setGames] = useState<Game[]>([]);
     const [appDetails, setAppDetails] = useState<{ whatsapp_no?: string, mobile_no?: string } | null>(null);
     const [loading, setLoading] = useState(true);
     const { addLog } = useLogStore();
+    const { token, setToken } = useAuthStore();
+    const [isCheckingAuth, setIsCheckingAuth] = useState(true);
 
     useEffect(() => {
-        const fetchGames = async () => {
-            const result = await getGames();
-            addLog({ title: 'getGames Response', data: result });
-            if (result.success && result.data) {
-                setGames(result.data);
-            } else {
-                console.error("Failed to fetch games:", result.error);
-            }
-        };
-
-        const fetchAppDetails = async () => {
-             const result = await getAppDetails();
-             addLog({ title: 'getAppDetails Response', data: result });
-             if (result.success && result.data) {
-                setAppDetails(result.data);
-             } else {
-                 console.error("Failed to fetch app details:", result.error);
-             }
-        };
-        
-        const loadData = async () => {
-            setLoading(true);
-            await Promise.all([fetchGames(), fetchAppDetails()]);
-            setLoading(false);
+        const authToken = Cookies.get('auth_token');
+        if (authToken) {
+            setToken(authToken);
         }
+        setIsCheckingAuth(false);
+    }, [setToken]);
 
-        loadData();
-    }, [addLog]);
+    useEffect(() => {
+        if (!isCheckingAuth && !token) {
+            router.push('/login');
+        }
+    }, [isCheckingAuth, token, router]);
+
+    useEffect(() => {
+        if (token) {
+            const fetchGames = async () => {
+                const result = await getGames();
+                addLog({ title: 'getGames Response', data: result });
+                if (result.success && result.data) {
+                    setGames(result.data);
+                } else {
+                    console.error("Failed to fetch games:", result.error);
+                }
+            };
+
+            const fetchAppDetails = async () => {
+                const result = await getAppDetails();
+                addLog({ title: 'getAppDetails Response', data: result });
+                if (result.success && result.data) {
+                    setAppDetails(result.data);
+                } else {
+                    console.error("Failed to fetch app details:", result.error);
+                }
+            };
+            
+            const loadData = async () => {
+                setLoading(true);
+                await Promise.all([fetchGames(), fetchAppDetails()]);
+                setLoading(false);
+            }
+
+            loadData();
+        }
+    }, [token, addLog]);
+    
+    if (isCheckingAuth || !token) {
+      return (
+        <div className="flex min-h-screen items-center justify-center">
+          <Loader2 className="h-8 w-8 animate-spin" />
+        </div>
+      );
+    }
 
     if (loading) {
         return (
