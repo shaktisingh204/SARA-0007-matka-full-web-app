@@ -13,24 +13,24 @@ import Cookies from 'js-cookie';
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
-  const { setToken, isAuthenticated } = useAuthStore();
+  const { setToken, token } = useAuthStore();
   const [isCheckingAuth, setIsCheckingAuth] = useState(true);
 
   useEffect(() => {
-    const token = Cookies.get('auth_token');
-    if (token) {
-      setToken(token);
+    const tokenFromCookie = Cookies.get('auth_token');
+    if (tokenFromCookie) {
+      setToken(tokenFromCookie);
     }
     setIsCheckingAuth(false);
   }, [setToken]);
   
   useEffect(() => {
-    if (!isCheckingAuth && !isAuthenticated) {
+    if (!isCheckingAuth && !token) {
       router.push('/login');
     }
-  }, [isCheckingAuth, isAuthenticated, router]);
+  }, [isCheckingAuth, token, router]);
 
-  if (isCheckingAuth || !isAuthenticated) {
+  if (isCheckingAuth || !token) {
     return (
       <div className="flex min-h-screen items-center justify-center">
         <Loader2 className="h-8 w-8 animate-spin" />
