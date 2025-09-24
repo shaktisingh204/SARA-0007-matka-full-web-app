@@ -1,3 +1,4 @@
+
 // src/app/actions/user.ts
 'use server';
 
@@ -24,24 +25,11 @@ export async function getUserDetails(): Promise<ApiResult> {
   }
   
   const cookieStore = cookies();
-  const authCookie = cookieStore.get('auth-storage');
-
-  if (!authCookie) {
-    return { success: false, error: 'User not authenticated.' };
-  }
-
-  let token: string | undefined;
-  try {
-    const authData = JSON.parse(authCookie.value);
-    token = authData?.state?.token;
-  } catch (e) {
-     return { success: false, error: 'Invalid auth token format.' };
-  }
+  const token = cookieStore.get('auth_token')?.value;
  
   if (!token) {
-    return { success: false, error: 'Authentication token not found.' };
+    return { success: false, error: 'User not authenticated.' };
   }
-
 
   // Fallback for restricted development environment
   if (API_BASE_URL.startsWith('https://gurumatka.matkadash.in')) {

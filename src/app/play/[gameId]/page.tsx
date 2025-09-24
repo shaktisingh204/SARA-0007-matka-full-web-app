@@ -1,7 +1,7 @@
 
 'use client';
 import { games } from '@/lib/data';
-import { notFound, useRouter } from 'next/navigation';
+import { notFound, useRouter, useParams } from 'next/navigation';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { ArrowRight } from 'lucide-react';
 
@@ -16,9 +16,11 @@ const betTypes = [
     { id: 'full-sangam', name: 'Full Sangam', description: 'Open Patti + Close Patti' },
 ]
 
-export default function PlayGamePage({ params }: { params: { gameId: string } }) {
+export default function PlayGamePage() {
   const router = useRouter();
-  const game = games.find((g) => g.id === params.gameId);
+  const params = useParams();
+  const gameId = params.gameId;
+  const game = games.find((g) => g.id === gameId);
 
   if (!game) {
     notFound();

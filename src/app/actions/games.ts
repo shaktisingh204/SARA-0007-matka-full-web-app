@@ -4,7 +4,6 @@
 import type { Game } from '@/lib/types';
 import { games as mockGames } from '@/lib/data';
 import { cookies } from 'next/headers';
-import { useAuthStore } from '@/lib/store';
 
 type ApiResult = {
   success: boolean;
@@ -23,25 +22,18 @@ export async function getGames(): Promise<ApiResult> {
     console.error('API_BASE_URL environment variable is not set.');
     return { success: false, error: 'API endpoint is not configured.' };
   }
+  
+  const cookieStore = cookies();
+  const token = cookieStore.get('auth_token')?.value;
+
+  if (!token) {
+    return { success: false, error: 'User not authenticated.' };
+  }
 
   // Fallback for restricted development environment
   if (API_BASE_URL.startsWith('https://gurumatka.matkadash.in')) {
     console.log('Using mock games response due to network restrictions.');
     return { success: true, data: mockGames };
-  }
-  
-  const cookieStore = cookies();
-  const authCookie = cookieStore.get('auth-storage');
-  
-  if (!authCookie) {
-    return { success: false, error: 'User not authenticated.' };
-  }
-
-  const { state } = JSON.parse(authCookie.value);
-  const token = state.token;
-
-  if (!token) {
-    return { success: false, error: 'Authentication token not found.' };
   }
   
   try {
@@ -61,8 +53,8 @@ export async function getGames(): Promise<ApiResult> {
         const games: Game[] = data.data.map((apiGame: any) => ({
           id: apiGame.id.toString(),
           name: apiGame.name,
-          openTime: apiGame.open_time,
-          closeTime: apiGame.close_time,
+          open_time: apiGame.open_time,
+          close_time: apiGame.close_time,
         }));
         return { success: true, data: games };
     } else {

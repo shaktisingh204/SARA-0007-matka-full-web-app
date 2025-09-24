@@ -10,7 +10,6 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Crown, Loader2 } from "lucide-react";
 import Link from "next/link";
 import { useForm } from "react-hook-form";
@@ -67,13 +66,13 @@ export default function LoginPage() {
         title: "Login Successful",
         description: "Welcome back!",
       });
-      setToken(result.token);
-      router.push("/dashboard");
+      setToken(result.token); // This will trigger the useEffect in the layout
+      router.push("/dashboard"); // Manually trigger navigation
     }
   };
 
   return (
-    <Card className="mx-auto max-w-sm">
+    <Card className="mx-auto max-w-sm w-full">
       <CardHeader>
         <div className="flex justify-center mb-4">
           <Crown className="h-10 w-10 text-primary" />

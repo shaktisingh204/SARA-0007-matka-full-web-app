@@ -7,15 +7,17 @@ import { useAppStore, useAuthStore, useUserProfileStore } from '@/lib/store';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 import { getUserDetails } from '@/app/actions/user';
+import { logout as logoutAction } from '@/app/actions/auth';
 
 export function Header() {
   const { toggleSheet } = useAppStore();
-  const { isAuthenticated, logout } = useAuthStore();
+  const { isAuthenticated, logout: logoutFromStore } = useAuthStore();
   const { userProfile, setUserProfile, clearUserProfile } = useUserProfileStore();
   const router = useRouter();
 
   useEffect(() => {
     async function fetchUserDetails() {
+      // Fetch details only if authenticated and profile is not already loaded
       if (isAuthenticated && !userProfile) {
         const result = await getUserDetails();
         if (result.success && result.data) {
@@ -28,9 +30,10 @@ export function Header() {
     fetchUserDetails();
   }, [isAuthenticated, userProfile, setUserProfile]);
 
-  const handleLogout = () => {
-    logout();
-    clearUserProfile();
+  const handleLogout = async () => {
+    await logoutAction(); // Clear cookie via server action
+    logoutFromStore(); // Clear client-side state
+    clearUserProfile(); // Clear user profile from session storage
     router.push('/login');
   };
   

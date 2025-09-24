@@ -2,6 +2,7 @@
 'use server';
 
 import { z } from 'zod';
+import { cookies } from 'next/headers';
 
 const signupSchema = z.object({
   full_name: z.string().min(1),
@@ -75,30 +76,49 @@ export async function loginUser(values: z.infer<typeof loginSchema>) {
     return { error: 'API endpoint is not configured.' };
   }
 
+  let result;
   // Fallback for restricted development environment
   if (API_BASE_URL.startsWith('https://gurumatka.matkadash.in')) {
     console.log('Using mock login response due to network restrictions.');
-    return mockLoginSuccess;
+    result = mockLoginSuccess;
+  } else {
+      try {
+        const response = await fetch(`${API_BASE_URL}/login`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: new URLSearchParams(validatedFields.data),
+        });
+
+        const data = await response.json();
+
+        if (data.status === 'success' && data.token) {
+            result = { success: data.message, token: data.token };
+        } else {
+            return { error: data.message || 'Login failed.' };
+        }
+      } catch (error) {
+          console.error('Login Error:', error);
+          return { error: 'An unexpected error occurred.' };
+      }
   }
 
-  try {
-    const response = await fetch(`${API_BASE_URL}/login`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: new URLSearchParams(validatedFields.data),
+  if (result.token) {
+    // Set the cookie on the server-side
+    cookies().set('auth_token', result.token, {
+      httpOnly: true, // For security
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      path: '/',
+      maxAge: 60 * 60 * 24 * 7, // 1 week
     });
-
-    const data = await response.json();
-
-    if (data.status === 'success' && data.token) {
-        return { success: data.message, token: data.token };
-    } else {
-        return { error: data.message || 'Login failed.' };
-    }
-  } catch (error) {
-      console.error('Login Error:', error);
-      return { error: 'An unexpected error occurred.' };
   }
+  
+  return result;
+}
+
+export async function logout() {
+  cookies().delete('auth_token');
+  return { success: true };
 }

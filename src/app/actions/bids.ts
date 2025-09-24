@@ -4,6 +4,7 @@
 import type { Bid } from '@/lib/types';
 import { revalidatePath } from 'next/cache';
 import { bids as mockBids } from '@/lib/data';
+import { cookies } from 'next/headers';
 
 /**
  * Fetches the bid history for a given user from the API.
@@ -17,6 +18,14 @@ export async function getBids(userId: string): Promise<Bid[]> {
     console.error('API_BASE_URL environment variable is not set.');
     return [];
   }
+  
+  const cookieStore = cookies();
+  const token = cookieStore.get('auth_token')?.value;
+
+  if (!token) {
+    console.error('Authentication token not found.');
+    return [];
+  }
 
   // Fallback for restricted development environment
   if (API_BASE_URL.startsWith('https://gurumatka.matkadash.in')) {
@@ -25,13 +34,11 @@ export async function getBids(userId: string): Promise<Bid[]> {
   }
 
   try {
-    // In a real app, you would pass the userId and authentication token.
-    // For now, we are just calling the endpoint.
     const response = await fetch(`${API_BASE_URL}/bid_history`, {
-      method: 'POST', // Assuming it's a POST request as is common
+      method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        // 'Authorization': `Bearer ${userToken}` // Add auth token if needed
+        'token': token
       },
       body: JSON.stringify({ userId: userId }), // Sending userId in the body
       next: {

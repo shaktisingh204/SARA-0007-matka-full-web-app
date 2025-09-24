@@ -73,7 +73,7 @@ export default function SignupPage() {
   };
 
   return (
-    <Card className="mx-auto max-w-sm">
+    <Card className="mx-auto max-w-sm w-full">
       <CardHeader>
         <div className="flex justify-center mb-4">
           <Crown className="h-10 w-10 text-primary" />
