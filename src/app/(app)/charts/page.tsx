@@ -1,4 +1,3 @@
-
 import { HistoricalChart } from "@/components/charts/historical-chart";
 import { Suspense } from "react";
 

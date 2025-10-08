@@ -1,4 +1,3 @@
-
 import { BidsHistoryClient } from "@/components/bids/bids-history-client";
 
 export default function BidsPage() {

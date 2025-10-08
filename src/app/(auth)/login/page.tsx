@@ -1,4 +1,3 @@
-
 'use client';
 
 import { Button } from "@/components/ui/button";
@@ -28,6 +27,7 @@ import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/lib/store";
+import Cookies from 'js-cookie';
 
 const loginSchema = z.object({
   mobile: z.string().min(10, "Mobile number must be at least 10 digits"),
@@ -66,9 +66,10 @@ export default function LoginPage() {
         title: "Login Successful",
         description: "Welcome back!",
       });
+      Cookies.set('auth_token', result.token, { expires: 7 });
       setToken(result.token);
       router.push("/dashboard");
-      router.refresh(); // Ensure layout re-renders with new auth state
+      router.refresh();
     }
   };
 

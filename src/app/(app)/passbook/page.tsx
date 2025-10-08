@@ -1,4 +1,3 @@
-
 import { PassbookClient } from "@/components/passbook/passbook-client";
 
 export default function PassbookPage() {

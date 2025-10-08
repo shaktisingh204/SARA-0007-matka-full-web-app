@@ -1,8 +1,7 @@
-
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { usePathname, useRouter } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import Cookies from 'js-cookie';
 import { useAuthStore } from '@/lib/store';
 import { Loader2 } from 'lucide-react';

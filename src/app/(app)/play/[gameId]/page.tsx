@@ -1,4 +1,3 @@
-
 'use client';
 import { games } from '@/lib/data';
 import { notFound, useRouter, useParams } from 'next/navigation';
