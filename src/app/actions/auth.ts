@@ -40,7 +40,7 @@ export async function signupUser(values: z.infer<typeof signupSchema>) {
     console.log('Using mock signup response due to network restrictions.');
     return { success: 'Signup successful. You can now log in.' };
   }
-  
+
   try {
     const response = await fetch(`${API_BASE_URL}/signup`, {
       method: 'POST',
@@ -69,7 +69,7 @@ export async function loginUser(values: z.infer<typeof loginSchema>) {
   if (!validatedFields.success) {
     return { error: 'Invalid fields.' };
   }
-  
+
   const API_BASE_URL = process.env.API_BASE_URL;
 
   if (!API_BASE_URL) {
@@ -82,43 +82,45 @@ export async function loginUser(values: z.infer<typeof loginSchema>) {
     console.log('Using mock login response due to network restrictions.');
     result = mockLoginSuccess;
   } else {
-      try {
-        const response = await fetch(`${API_BASE_URL}/login`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
-            },
-            body: new URLSearchParams(validatedFields.data),
-        });
+    try {
+      const response = await fetch(`${API_BASE_URL}/login`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: new URLSearchParams(validatedFields.data),
+      });
 
-        const data = await response.json();
+      const data = await response.json();
 
-        if (data.status === 'success' && data.token) {
-            result = { success: data.message, token: data.token };
-        } else {
-            return { error: data.message || 'Login failed.' };
-        }
-      } catch (error) {
-          console.error('Login Error:', error);
-          return { error: 'An unexpected error occurred.' };
+      if (data.status === 'success' && data.token) {
+        result = { success: data.message, token: data.token };
+      } else {
+        return { error: data.message || 'Login failed.' };
       }
+    } catch (error) {
+      console.error('Login Error:', error);
+      return { error: 'An unexpected error occurred.' };
+    }
   }
 
   if (result.token) {
     // Set the cookie on the server-side
-    cookies().set('auth_token', result.token, {
-      httpOnly: true, // For security
+    const cookieStore = await cookies();
+    cookieStore.set('auth_token', result.token, {
+      httpOnly: false, // For client-side js-cookie access
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',
       path: '/',
       maxAge: 60 * 60 * 24 * 7, // 1 week
     });
   }
-  
+
   return result;
 }
 
 export async function logout() {
-  cookies().delete('auth_token');
+  const cookieStore = await cookies();
+  cookieStore.delete('auth_token');
   return { success: true };
 }
