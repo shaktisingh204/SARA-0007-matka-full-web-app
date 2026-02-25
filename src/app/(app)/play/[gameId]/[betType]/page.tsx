@@ -153,7 +153,8 @@ export default function PlaceBetPage({ params }: { params: Promise<{ gameId: str
 
 
   if (!game || !betType) {
-    notFound();
+    if (!loading) notFound();
+    return null;
   }
 
   const validateAndAddBid = () => {
