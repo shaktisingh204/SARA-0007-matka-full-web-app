@@ -20,18 +20,18 @@ type Bid = {
 }
 
 function SubmitButton() {
-  const { pending } = useFormStatus();
-  return (
-    <Button type="submit" className="w-full" disabled={pending}>
-       {pending ? (
-        <>
-          <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Submitting...
-        </>
-      ) : (
-        'Submit All Bids'
-      )}
-    </Button>
-  );
+    const { pending } = useFormStatus();
+    return (
+        <Button type="submit" className="w-full" disabled={pending}>
+            {pending ? (
+                <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Submitting...
+                </>
+            ) : (
+                'Submit All Bids'
+            )}
+        </Button>
+    );
 }
 
 export default function FullSangamPage() {
@@ -45,19 +45,20 @@ export default function FullSangamPage() {
     const [closePatti, setClosePatti] = useState('');
     const [betAmount, setBetAmount] = useState('');
     const [bids, setBids] = useState<Bid[]>([]);
-    
+
     const initialState = { error: undefined, success: undefined };
     const [state, dispatch] = useFormState(submitFullSangamBids, initialState);
-    
+
     useEffect(() => {
         if (state.error) {
-          toast({ title: 'Submission Error', description: state.error, variant: 'destructive' });
+            toast({ title: 'Submission Error', description: state.error, variant: 'destructive' });
         }
         if (state.success) {
-          toast({ title: 'Bids Submitted', description: `${bids.length} Full Sangam bids have been successfully placed.`,
-            action: <CheckCircle className="h-5 w-5 text-green-500" />
-          });
-          setBids([]);
+            toast({
+                title: 'Bids Submitted', description: `${bids.length} Full Sangam bids have been successfully placed.`,
+                action: <CheckCircle className="h-5 w-5 text-green-500" />
+            });
+            setBids([]);
         }
     }, [state, toast, bids.length]);
 
@@ -112,38 +113,38 @@ export default function FullSangamPage() {
                     <CardDescription>Placing Bet: <span className="font-semibold">Full Sangam</span></CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                   <div>
-                       <Label htmlFor="open-patti">Open Patti (3 digits)</Label>
-                       <Input 
-                           id="open-patti" 
-                           type="number" 
-                           placeholder="e.g., 123" 
-                           value={openPatti}
-                           onChange={(e) => setOpenPatti(e.target.value)}
-                           maxLength={3}
-                       />
-                   </div>
-                   <div>
-                       <Label htmlFor="close-patti">Close Patti (3 digits)</Label>
-                       <Input 
-                           id="close-patti" 
-                           type="number" 
-                           placeholder="e.g., 456" 
-                           value={closePatti}
-                           onChange={(e) => setClosePatti(e.target.value)}
-                           maxLength={3}
-                       />
-                   </div>
-                   <div>
-                       <Label htmlFor="bet-amount">Amount</Label>
-                       <Input 
-                           id="bet-amount" 
-                           type="number" 
-                           placeholder="Enter amount" 
-                           value={betAmount}
-                           onChange={(e) => setBetAmount(e.target.value)}
-                       />
-                   </div>
+                    <div>
+                        <Label htmlFor="open-patti">Open Patti (3 digits)</Label>
+                        <Input
+                            id="open-patti"
+                            type="number"
+                            placeholder="e.g., 123"
+                            value={openPatti}
+                            onChange={(e) => setOpenPatti(e.target.value)}
+                            maxLength={3}
+                        />
+                    </div>
+                    <div>
+                        <Label htmlFor="close-patti">Close Patti (3 digits)</Label>
+                        <Input
+                            id="close-patti"
+                            type="number"
+                            placeholder="e.g., 456"
+                            value={closePatti}
+                            onChange={(e) => setClosePatti(e.target.value)}
+                            maxLength={3}
+                        />
+                    </div>
+                    <div>
+                        <Label htmlFor="bet-amount">Amount</Label>
+                        <Input
+                            id="bet-amount"
+                            type="number"
+                            placeholder="Enter amount"
+                            value={betAmount}
+                            onChange={(e) => setBetAmount(e.target.value)}
+                        />
+                    </div>
                 </CardContent>
                 <CardFooter>
                     <Button className="w-full" variant="outline" onClick={validateAndAddBid}>Add Bid</Button>
@@ -184,6 +185,7 @@ export default function FullSangamPage() {
                     <CardFooter>
                         <form action={dispatch} className="w-full">
                             <input type="hidden" name="bids" value={JSON.stringify(bids)} />
+                            <input type="hidden" name="gameName" value={game.name} />
                             <SubmitButton />
                         </form>
                     </CardFooter>

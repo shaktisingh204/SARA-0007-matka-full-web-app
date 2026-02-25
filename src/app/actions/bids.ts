@@ -13,13 +13,7 @@ import { cookies } from 'next/headers';
  * @returns A promise that resolves to an array of bids.
  */
 export async function getBids(userId: string): Promise<Bid[]> {
-  const API_BASE_URL = process.env.API_BASE_URL;
-  if (!API_BASE_URL) {
-    console.error('API_BASE_URL environment variable is not set.');
-    return [];
-  }
-  
-  const cookieStore = cookies();
+  const cookieStore = await cookies();
   const token = cookieStore.get('auth_token')?.value;
 
   if (!token) {
@@ -27,51 +21,29 @@ export async function getBids(userId: string): Promise<Bid[]> {
     return [];
   }
 
-  // Fallback for restricted development environment
-  if (API_BASE_URL.startsWith('https://gurumatka.matkadash.in')) {
-    console.log('Using mock bids response due to network restrictions.');
-    return mockBids;
-  }
-
   try {
-    const response = await fetch(`${API_BASE_URL}/bid_history`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'token': token
-      },
-      body: JSON.stringify({ userId: userId }), // Sending userId in the body
-      next: {
-        tags: ['bids'],
-      }
-    });
+    const { default: connectToDatabase } = await import('@/lib/db');
+    const { Bid: BidModel } = await import('@/lib/models');
 
-    if (!response.ok) {
-      console.error(`API call failed with status: ${response.status}`);
-      return [];
-    }
+    await connectToDatabase();
 
-    const data = await response.json();
+    const bidsData = await BidModel.find({ userId }).sort({ createdAt: -1 });
 
-    if (data && Array.isArray(data.bids)) {
-        const bids: Bid[] = data.bids.map((apiBid: any) => ({
-          id: apiBid.id.toString(),
-          userId: apiBid.user_id,
-          gameName: apiBid.game_name,
-          betType: apiBid.bet_type,
-          market: apiBid.market,
-          number: apiBid.number,
-          amount: parseFloat(apiBid.amount),
-          date: apiBid.created_at,
-          status: apiBid.status,
-        }));
-        return bids;
-    }
+    const bids: Bid[] = bidsData.map((dbBid: any) => ({
+      id: dbBid._id.toString(),
+      userId: dbBid.userId.toString(),
+      gameName: dbBid.gameName,
+      betType: dbBid.betType,
+      market: dbBid.market,
+      number: dbBid.number,
+      amount: dbBid.amount,
+      date: dbBid.createdAt.toISOString(),
+      status: dbBid.status,
+    }));
 
-    return [];
-    
+    return bids;
   } catch (e) {
-    console.error("Failed to fetch bids from API:", e);
+    console.error("Failed to fetch bids from DB:", e);
     return [];
   }
 }

@@ -1,6 +1,7 @@
 'use server';
 
 import { z } from 'zod';
+import { cookies } from 'next/headers';
 
 const betSchema = z.object({
   id: z.number(),
@@ -25,23 +26,23 @@ const fullSangamBetSchema = z.object({
 });
 
 const betTypeValidations: { [key: string]: (numStr: string) => boolean } = {
-    'ank': (numStr) => /^\d$/.test(numStr),
-    'jodi': (numStr) => /^\d{2}$/.test(numStr),
-    'patti': (numStr) => /^\d{3}$/.test(numStr),
-    'single-patti': (numStr) => {
-        if (!/^\d{3}$/.test(numStr)) return false;
-        const digits = numStr.split('');
-        return new Set(digits).size === 3;
-    },
-    'double-patti': (numStr) => {
-        if (!/^\d{3}$/.test(numStr)) return false;
-        const digits = numStr.split('');
-        return new Set(digits).size === 2;
-    },
-    'triple-patti': (numStr) => {
-        if (!/^\d{3}$/.test(numStr)) return false;
-        return new Set(numStr.split('')).size === 1;
-    },
+  'ank': (numStr) => /^\d$/.test(numStr),
+  'jodi': (numStr) => /^\d{2}$/.test(numStr),
+  'patti': (numStr) => /^\d{3}$/.test(numStr),
+  'single-patti': (numStr) => {
+    if (!/^\d{3}$/.test(numStr)) return false;
+    const digits = numStr.split('');
+    return new Set(digits).size === 3;
+  },
+  'double-patti': (numStr) => {
+    if (!/^\d{3}$/.test(numStr)) return false;
+    const digits = numStr.split('');
+    return new Set(digits).size === 2;
+  },
+  'triple-patti': (numStr) => {
+    if (!/^\d{3}$/.test(numStr)) return false;
+    return new Set(numStr.split('')).size === 1;
+  },
 };
 
 type SubmitBetsState = {
@@ -49,15 +50,55 @@ type SubmitBetsState = {
   error?: string;
 }
 
+async function processTransaction(bids: any[], totalAmount: number, gameName: string) {
+  const cookieStore = await cookies();
+  const token = cookieStore.get('auth_token')?.value;
+
+  if (!token) return { error: 'Not authenticated. Please log in.' };
+
+  // Dynamic imports structure like in other actions
+  const { verifyJwtToken } = await import('@/lib/jwt');
+  const { default: connectToDatabase } = await import('@/lib/db');
+  const { User, Bid: BidModel } = await import('@/lib/models');
+
+  const payload = await verifyJwtToken(token);
+  if (!payload || !payload.userId) return { error: 'Invalid or expired authentication token.' };
+
+  await connectToDatabase();
+
+  // Atomic check and deduct to prevent race conditions during betting
+  const user = await User.findOneAndUpdate(
+    { _id: payload.userId, wallet_balance: { $gte: totalAmount } },
+    { $inc: { wallet_balance: -totalAmount } },
+    { new: true }
+  );
+
+  if (!user) {
+    return { error: 'Insufficient wallet balance to place these bids.' };
+  }
+
+  // Insert Bids
+  const records = bids.map(b => ({
+    ...b,
+    userId: payload.userId,
+    gameName: gameName,
+    status: 'Pending'
+  }));
+  await BidModel.insertMany(records);
+
+  return { success: true };
+}
+
 export async function submitBids(
   prevState: SubmitBetsState,
   formData: FormData
 ): Promise<SubmitBetsState> {
   const bidsJson = formData.get('bids') as string;
+  const gameName = formData.get('gameName') as string || 'Unknown Game';
   if (!bidsJson) {
     return { error: 'No bids provided.' };
   }
-  
+
   try {
     const bids = JSON.parse(bidsJson);
     const validatedBids = z.array(betSchema).safeParse(bids);
@@ -66,23 +107,37 @@ export async function submitBids(
       return { error: 'Invalid bid format.' };
     }
 
+    let totalAmount = 0;
+    const records = [];
+
     for (const bid of validatedBids.data) {
       const isValidAmount = /^[1-9]\d*$/.test(bid.amount);
       if (!isValidAmount) {
         return { error: `Invalid amount for number ${bid.number}.` };
       }
-      
+
       const validationFn = betTypeValidations[bid.betType];
       if (!validationFn || !validationFn(bid.number)) {
-          return { error: `Invalid number ${bid.number} for the selected bet type.`};
+        return { error: `Invalid number ${bid.number} for the selected bet type.` };
       }
+
+      const amt = parseInt(bid.amount, 10);
+      totalAmount += amt;
+      records.push({
+        betType: bid.betType,
+        market: bid.market,
+        number: bid.number,
+        amount: amt
+      });
     }
-    
-    // In a real app, you would save the bids to a database here.
-    console.log('Successfully validated bids:', validatedBids.data);
+
+    const txResult = await processTransaction(records, totalAmount, gameName);
+    if (txResult.error) return { error: txResult.error };
+
     return { success: true };
 
   } catch (e) {
+    console.error('Submit Bids Error:', e);
     return { error: 'An unexpected error occurred.' };
   }
 }
@@ -92,6 +147,7 @@ export async function submitHalfSangamBids(
   formData: FormData
 ): Promise<SubmitBetsState> {
   const bidsJson = formData.get('bids') as string;
+  const gameName = formData.get('gameName') as string || 'Unknown Game';
   if (!bidsJson) {
     return { error: 'No bids provided.' };
   }
@@ -104,10 +160,26 @@ export async function submitHalfSangamBids(
       return { error: 'Invalid bid format.' };
     }
 
-    // In a real app, you would save the bids to a database here.
-    console.log('Successfully validated Half Sangam bids:', validatedBids.data);
+    let totalAmount = 0;
+    const records = [];
+
+    for (const bid of validatedBids.data) {
+      const amt = parseInt(bid.amount, 10);
+      totalAmount += amt;
+      records.push({
+        betType: 'half-sangam',
+        market: 'sangam',
+        number: `${bid.openPatti}-${bid.closeJodi}`,
+        amount: amt
+      });
+    }
+
+    const txResult = await processTransaction(records, totalAmount, gameName);
+    if (txResult.error) return { error: txResult.error };
+
     return { success: true };
   } catch (e) {
+    console.error('Submit Half Sangam Error:', e);
     return { error: 'An unexpected error occurred.' };
   }
 }
@@ -117,6 +189,7 @@ export async function submitFullSangamBids(
   formData: FormData
 ): Promise<SubmitBetsState> {
   const bidsJson = formData.get('bids') as string;
+  const gameName = formData.get('gameName') as string || 'Unknown Game';
   if (!bidsJson) {
     return { error: 'No bids provided.' };
   }
@@ -129,10 +202,26 @@ export async function submitFullSangamBids(
       return { error: 'Invalid bid format.' };
     }
 
-    // In a real app, you would save the bids to a database here.
-    console.log('Successfully validated Full Sangam bids:', validatedBids.data);
+    let totalAmount = 0;
+    const records = [];
+
+    for (const bid of validatedBids.data) {
+      const amt = parseInt(bid.amount, 10);
+      totalAmount += amt;
+      records.push({
+        betType: 'full-sangam',
+        market: 'sangam',
+        number: `${bid.openPatti}-${bid.closePatti}`,
+        amount: amt
+      });
+    }
+
+    const txResult = await processTransaction(records, totalAmount, gameName);
+    if (txResult.error) return { error: txResult.error };
+
     return { success: true };
   } catch (e) {
+    console.error('Submit Full Sangam Error:', e);
     return { error: 'An unexpected error occurred.' };
   }
 }

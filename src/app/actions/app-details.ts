@@ -26,20 +26,17 @@ type ApiResult = {
  * @returns A promise that resolves to an object with success status and data or error.
  */
 export async function getAppDetails(): Promise<ApiResult> {
-  const API_BASE_URL = process.env.API_BASE_URL;
+  try {
+    const { default: connectToDatabase } = await import('@/lib/db');
+    const { AppDetails } = await import('@/lib/models');
 
-  if (!API_BASE_URL) {
-    console.error('API_BASE_URL environment variable is not set.');
-    return { success: false, error: 'API endpoint is not configured.' };
-  }
+    await connectToDatabase();
 
-  // Fallback for restricted development environment
-  if (API_BASE_URL.startsWith('https://gurumatka.matkadash.in')) {
-    console.log('Using mock app details response due to network restrictions.');
-    return {
-      success: true,
-      data: {
-        id: '1',
+    let details = await AppDetails.findOne();
+
+    if (!details) {
+      // Seed default details if none exist
+      details = await AppDetails.create({
         app_name: 'MatkaCalc',
         version_code: '1.0',
         app_link: 'http://example.com',
@@ -48,28 +45,25 @@ export async function getAppDetails(): Promise<ApiResult> {
         upi_id: 'mock@upi',
         add_fund_text: 'Add funds easily.',
         withdraw_fund_text: 'Withdraw your winnings.',
-      },
-    };
-  }
-
-  try {
-    const response = await fetch(`${API_BASE_URL}/app_details`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
-      },
-       body: new URLSearchParams({ string: " " }),
-    });
-
-    const data = await response.json();
-
-    if (response.ok && data && data.data) {
-      return { success: true, data: data.data };
-    } else {
-      return { success: false, error: data.message || 'Failed to fetch app details.' };
+      });
     }
+
+    return {
+      success: true,
+      data: {
+        id: details._id.toString(),
+        app_name: details.app_name,
+        version_code: details.version_code,
+        app_link: details.app_link,
+        whatsapp_no: details.whatsapp_no,
+        mobile_no: details.mobile_no,
+        upi_id: details.upi_id,
+        add_fund_text: details.add_fund_text,
+        withdraw_fund_text: details.withdraw_fund_text,
+      }
+    };
   } catch (e) {
-    console.error('Failed to fetch app details from API:', e);
+    console.error('Failed to fetch app details from DB:', e);
     return { success: false, error: 'An unexpected error occurred.' };
   }
 }
