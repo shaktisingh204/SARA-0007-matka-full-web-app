@@ -10,6 +10,8 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Trash2, Loader2, CheckCircle } from 'lucide-react';
 import { useFormState, useFormStatus } from 'react-dom';
 import { submitFullSangamBids } from '@/app/actions/bets';
+import { getGames } from '@/app/actions/games';
+import { ALL_VALID_PATTIS } from '@/lib/matka-rules';
 
 type Bid = {
     id: number;
@@ -32,8 +34,6 @@ function SubmitButton() {
         </Button>
     );
 }
-
-import { getGames } from '@/app/actions/games';
 
 export default function FullSangamPage({ params }: { params: Promise<{ gameId: string }> }) {
     const { toast } = useToast();
@@ -81,13 +81,13 @@ export default function FullSangamPage({ params }: { params: Promise<{ gameId: s
 
     if (!game) {
         if (!loading) notFound();
-        return null; // Or a loading spinner
+        return null;
     }
 
     const validateAndAddBid = () => {
         const amount = parseInt(betAmount, 10);
-        const isOpenPattiValid = /^\d{3}$/.test(openPatti);
-        const isClosePattiValid = /^\d{3}$/.test(closePatti);
+        const isOpenPattiValid = ALL_VALID_PATTIS.has(openPatti);
+        const isClosePattiValid = ALL_VALID_PATTIS.has(closePatti);
 
         if (!openPatti || !closePatti || !betAmount) {
             toast({ title: "Invalid Input", description: "Please enter all fields.", variant: "destructive" });
@@ -98,11 +98,11 @@ export default function FullSangamPage({ params }: { params: Promise<{ gameId: s
             return;
         }
         if (!isOpenPattiValid) {
-            toast({ title: "Invalid Open Patti", description: "Open Patti must be a 3-digit number.", variant: "destructive" });
+            toast({ title: "Invalid Open Patti", description: "Please enter a valid Open Patti.", variant: "destructive" });
             return;
         }
         if (!isClosePattiValid) {
-            toast({ title: "Invalid Close Patti", description: "Close Patti must be a 3-digit number.", variant: "destructive" });
+            toast({ title: "Invalid Close Patti", description: "Please enter a valid Close Patti.", variant: "destructive" });
             return;
         }
 
@@ -123,6 +123,8 @@ export default function FullSangamPage({ params }: { params: Promise<{ gameId: s
         setBids(bids.filter(bid => bid.id !== id));
     }
 
+    const validPattisArray = Array.from(ALL_VALID_PATTIS);
+
     return (
         <div className="p-4 md:p-6 space-y-4">
             <Card>
@@ -135,7 +137,8 @@ export default function FullSangamPage({ params }: { params: Promise<{ gameId: s
                         <Label htmlFor="open-patti">Open Patti (3 digits)</Label>
                         <Input
                             id="open-patti"
-                            type="number"
+                            type="text"
+                            list="pattis"
                             placeholder="e.g., 123"
                             value={openPatti}
                             onChange={(e) => setOpenPatti(e.target.value)}
@@ -146,7 +149,8 @@ export default function FullSangamPage({ params }: { params: Promise<{ gameId: s
                         <Label htmlFor="close-patti">Close Patti (3 digits)</Label>
                         <Input
                             id="close-patti"
-                            type="number"
+                            type="text"
+                            list="pattis"
                             placeholder="e.g., 456"
                             value={closePatti}
                             onChange={(e) => setClosePatti(e.target.value)}
@@ -163,6 +167,10 @@ export default function FullSangamPage({ params }: { params: Promise<{ gameId: s
                             onChange={(e) => setBetAmount(e.target.value)}
                         />
                     </div>
+
+                    <datalist id="pattis">
+                        {validPattisArray.map((p) => <option key={p} value={p} />)}
+                    </datalist>
                 </CardContent>
                 <CardFooter>
                     <Button className="w-full" variant="outline" onClick={validateAndAddBid}>Add Bid</Button>

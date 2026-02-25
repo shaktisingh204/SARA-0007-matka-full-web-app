@@ -14,7 +14,16 @@ import { submitBids } from '@/app/actions/bets';
 
 import { getGames } from '@/app/actions/games';
 
-const betTypes: { [key: string]: { name: string, description: string, minLength: number, maxLength: number, validation: (numStr: string) => boolean, validationMessage: string } } = {
+import {
+  getValidAnk,
+  getValidJodi,
+  getValidSinglePatti,
+  getValidDoublePatti,
+  getValidTriplePatti,
+  getAllValidPattis
+} from '@/lib/matka-rules';
+
+const betTypes: { [key: string]: { name: string, description: string, minLength: number, maxLength: number, validation: (numStr: string) => boolean, validationMessage: string, getOptions: () => string[] } } = {
   // ... schemas remaining same
   'ank': {
     name: 'Single (Ank)',
@@ -22,7 +31,8 @@ const betTypes: { [key: string]: { name: string, description: string, minLength:
     minLength: 1,
     maxLength: 1,
     validation: (numStr) => /^\d$/.test(numStr),
-    validationMessage: 'Please enter a single digit (0-9).'
+    validationMessage: 'Please enter a single digit (0-9).',
+    getOptions: getValidAnk
   },
   'jodi': {
     name: 'Jodi',
@@ -30,7 +40,8 @@ const betTypes: { [key: string]: { name: string, description: string, minLength:
     minLength: 2,
     maxLength: 2,
     validation: (numStr) => /^\d{2}$/.test(numStr),
-    validationMessage: 'Please enter a two-digit number (00-99).'
+    validationMessage: 'Please enter a two-digit number (00-99).',
+    getOptions: getValidJodi
   },
   'patti': {
     name: 'Patti / Panna',
@@ -38,7 +49,8 @@ const betTypes: { [key: string]: { name: string, description: string, minLength:
     minLength: 3,
     maxLength: 3,
     validation: (numStr) => /^\d{3}$/.test(numStr),
-    validationMessage: 'Please enter a three-digit number (000-999).'
+    validationMessage: 'Please enter a valid three-digit setting.',
+    getOptions: getAllValidPattis
   },
   'single-patti': {
     name: 'Single Patti',
@@ -50,7 +62,8 @@ const betTypes: { [key: string]: { name: string, description: string, minLength:
       const digits = numStr.split('');
       return new Set(digits).size === 3;
     },
-    validationMessage: 'Please enter a 3-digit number with all unique digits.'
+    validationMessage: 'Please enter a 3-digit number with all unique digits.',
+    getOptions: getValidSinglePatti
   },
   'double-patti': {
     name: 'Double Patti',
@@ -62,7 +75,8 @@ const betTypes: { [key: string]: { name: string, description: string, minLength:
       const digits = numStr.split('');
       return new Set(digits).size === 2;
     },
-    validationMessage: 'Please enter a 3-digit number with exactly two same digits.'
+    validationMessage: 'Please enter a 3-digit number with exactly two same digits.',
+    getOptions: getValidDoublePatti
   },
   'triple-patti': {
     name: 'Triple Patti',
@@ -73,7 +87,8 @@ const betTypes: { [key: string]: { name: string, description: string, minLength:
       if (!/^\d{3}$/.test(numStr)) return false;
       return new Set(numStr.split('')).size === 1;
     },
-    validationMessage: 'Please enter a 3-digit number with all same digits.'
+    validationMessage: 'Please enter a 3-digit number with all same digits.',
+    getOptions: getValidTriplePatti
   },
 }
 
@@ -193,6 +208,8 @@ export default function PlaceBetPage({ params }: { params: Promise<{ gameId: str
     setBids(bids.filter(bid => bid.id !== id));
   }
 
+  const options = betType.getOptions();
+
   return (
     <div className="p-4 md:p-6 space-y-4">
       <Card>
@@ -220,11 +237,18 @@ export default function PlaceBetPage({ params }: { params: Promise<{ gameId: str
             <Label htmlFor="bet-number">{betType.description}</Label>
             <Input
               id="bet-number"
-              type="number"
-              placeholder="Enter number"
+              type="text"
+              list={`options-${betTypeKey}`}
+              placeholder="Select or enter number"
               value={betNumber}
               onChange={(e) => setBetNumber(e.target.value)}
+              maxLength={betType.maxLength}
             />
+            <datalist id={`options-${betTypeKey}`}>
+              {options.map((opt) => (
+                <option key={opt} value={opt} />
+              ))}
+            </datalist>
           </div>
           <div>
             <Label htmlFor="bet-amount">Amount</Label>

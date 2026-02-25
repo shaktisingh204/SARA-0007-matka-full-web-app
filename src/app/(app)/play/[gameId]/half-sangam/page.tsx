@@ -11,11 +11,16 @@ import { Trash2, Loader2, CheckCircle } from 'lucide-react';
 import { useFormState, useFormStatus } from 'react-dom';
 import { submitHalfSangamBids } from '@/app/actions/bets';
 
+import { getGames } from '@/app/actions/games';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { ALL_VALID_PATTIS, VALID_ANK } from '@/lib/matka-rules';
+
 type Bid = {
     id: number;
-    openPatti: string;
-    closeJodi: string;
+    openNumber: string;
+    closeNumber: string;
     amount: string;
+    sangamType: string;
 }
 
 function SubmitButton() {
@@ -33,8 +38,6 @@ function SubmitButton() {
     );
 }
 
-import { getGames } from '@/app/actions/games';
-
 export default function HalfSangamPage({ params }: { params: Promise<{ gameId: string }> }) {
     const { toast } = useToast();
 
@@ -42,8 +45,9 @@ export default function HalfSangamPage({ params }: { params: Promise<{ gameId: s
     const [gameId, setGameId] = useState<string>('');
     const [loading, setLoading] = useState(true);
 
-    const [openPatti, setOpenPatti] = useState('');
-    const [closeJodi, setCloseJodi] = useState('');
+    const [sangamType, setSangamType] = useState<'open_patti_close_ank' | 'open_ank_close_patti'>('open_patti_close_ank');
+    const [openNumber, setOpenNumber] = useState('');
+    const [closeNumber, setCloseNumber] = useState('');
     const [betAmount, setBetAmount] = useState('');
     const [bids, setBids] = useState<Bid[]>([]);
 
@@ -84,12 +88,27 @@ export default function HalfSangamPage({ params }: { params: Promise<{ gameId: s
         return null;
     }
 
+    const handleSangamTypeChange = (type: any) => {
+        setSangamType(type);
+        setOpenNumber('');
+        setCloseNumber('');
+    };
+
     const validateAndAddBid = () => {
         const amount = parseInt(betAmount, 10);
-        const isPattiValid = /^\d{3}$/.test(openPatti);
-        const isJodiValid = /^\d{2}$/.test(closeJodi);
 
-        if (!openPatti || !closeJodi || !betAmount) {
+        let isOpenValid = false;
+        let isCloseValid = false;
+
+        if (sangamType === 'open_patti_close_ank') {
+            isOpenValid = ALL_VALID_PATTIS.has(openNumber);
+            isCloseValid = VALID_ANK.has(closeNumber);
+        } else {
+            isOpenValid = VALID_ANK.has(openNumber);
+            isCloseValid = ALL_VALID_PATTIS.has(closeNumber);
+        }
+
+        if (!openNumber || !closeNumber || !betAmount) {
             toast({ title: "Invalid Input", description: "Please enter all fields.", variant: "destructive" });
             return;
         }
@@ -97,31 +116,35 @@ export default function HalfSangamPage({ params }: { params: Promise<{ gameId: s
             toast({ title: "Invalid Amount", description: "Amount must be a positive number.", variant: "destructive" });
             return;
         }
-        if (!isPattiValid) {
-            toast({ title: "Invalid Open Patti", description: "Open Patti must be a 3-digit number.", variant: "destructive" });
+        if (!isOpenValid) {
+            toast({ title: "Invalid Open Number", description: `Please select a valid ${sangamType === 'open_patti_close_ank' ? '3-digit Patti' : '1-digit Ank'}.`, variant: "destructive" });
             return;
         }
-        if (!isJodiValid) {
-            toast({ title: "Invalid Close Jodi", description: "Close Jodi must be a 2-digit number.", variant: "destructive" });
+        if (!isCloseValid) {
+            toast({ title: "Invalid Close Number", description: `Please select a valid ${sangamType === 'open_patti_close_ank' ? '1-digit Ank' : '3-digit Patti'}.`, variant: "destructive" });
             return;
         }
 
         const newBid: Bid = {
             id: Date.now(),
-            openPatti: openPatti,
-            closeJodi: closeJodi,
-            amount: betAmount
+            openNumber: openNumber,
+            closeNumber: closeNumber,
+            amount: betAmount,
+            sangamType: sangamType
         };
 
         setBids(prevBids => [...prevBids, newBid]);
-        setOpenPatti('');
-        setCloseJodi('');
+        setOpenNumber('');
+        setCloseNumber('');
         setBetAmount('');
     }
 
     const removeBid = (id: number) => {
         setBids(bids.filter(bid => bid.id !== id));
     }
+
+    const validPattisArray = Array.from(ALL_VALID_PATTIS);
+    const validAnkArray = Array.from(VALID_ANK);
 
     return (
         <div className="p-4 md:p-6 space-y-4">
@@ -131,26 +154,41 @@ export default function HalfSangamPage({ params }: { params: Promise<{ gameId: s
                     <CardDescription>Placing Bet: <span className="font-semibold">Half Sangam</span></CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
+                    <div className="space-y-2">
+                        <Label>Half Sangam Type</Label>
+                        <RadioGroup value={sangamType} onValueChange={handleSangamTypeChange} className="flex flex-col sm:flex-row gap-4">
+                            <div className="flex items-center space-x-2">
+                                <RadioGroupItem value="open_patti_close_ank" id="open_patti" />
+                                <Label htmlFor="open_patti">Open Patti + Close Ank</Label>
+                            </div>
+                            <div className="flex items-center space-x-2">
+                                <RadioGroupItem value="open_ank_close_patti" id="open_ank" />
+                                <Label htmlFor="open_ank">Open Ank + Close Patti</Label>
+                            </div>
+                        </RadioGroup>
+                    </div>
                     <div>
-                        <Label htmlFor="open-patti">Open Patti (3 digits)</Label>
+                        <Label htmlFor="open-number">{sangamType === 'open_patti_close_ank' ? 'Open Patti (3 digits)' : 'Open Ank (1 digit)'}</Label>
                         <Input
-                            id="open-patti"
-                            type="number"
-                            placeholder="e.g., 123"
-                            value={openPatti}
-                            onChange={(e) => setOpenPatti(e.target.value)}
-                            maxLength={3}
+                            id="open-number"
+                            type="text"
+                            list={sangamType === 'open_patti_close_ank' ? "pattis" : "anks"}
+                            placeholder={`e.g., ${sangamType === 'open_patti_close_ank' ? '123' : '5'}`}
+                            value={openNumber}
+                            onChange={(e) => setOpenNumber(e.target.value)}
+                            maxLength={sangamType === 'open_patti_close_ank' ? 3 : 1}
                         />
                     </div>
                     <div>
-                        <Label htmlFor="close-jodi">Close Jodi (2 digits)</Label>
+                        <Label htmlFor="close-number">{sangamType === 'open_patti_close_ank' ? 'Close Ank (1 digit)' : 'Close Patti (3 digits)'}</Label>
                         <Input
-                            id="close-jodi"
-                            type="number"
-                            placeholder="e.g., 45"
-                            value={closeJodi}
-                            onChange={(e) => setCloseJodi(e.target.value)}
-                            maxLength={2}
+                            id="close-number"
+                            type="text"
+                            list={sangamType === 'open_patti_close_ank' ? "anks" : "pattis"}
+                            placeholder={`e.g., ${sangamType === 'open_patti_close_ank' ? '5' : '123'}`}
+                            value={closeNumber}
+                            onChange={(e) => setCloseNumber(e.target.value)}
+                            maxLength={sangamType === 'open_patti_close_ank' ? 1 : 3}
                         />
                     </div>
                     <div>
@@ -163,6 +201,14 @@ export default function HalfSangamPage({ params }: { params: Promise<{ gameId: s
                             onChange={(e) => setBetAmount(e.target.value)}
                         />
                     </div>
+
+                    <datalist id="pattis">
+                        {validPattisArray.map((p) => <option key={p} value={p} />)}
+                    </datalist>
+                    <datalist id="anks">
+                        {validAnkArray.map((a) => <option key={a} value={a} />)}
+                    </datalist>
+
                 </CardContent>
                 <CardFooter>
                     <Button className="w-full" variant="outline" onClick={validateAndAddBid}>Add Bid</Button>
@@ -178,8 +224,9 @@ export default function HalfSangamPage({ params }: { params: Promise<{ gameId: s
                         <Table>
                             <TableHeader>
                                 <TableRow>
-                                    <TableHead>Open Patti</TableHead>
-                                    <TableHead>Close Jodi</TableHead>
+                                    <TableHead>Type</TableHead>
+                                    <TableHead>Open</TableHead>
+                                    <TableHead>Close</TableHead>
                                     <TableHead>Amount</TableHead>
                                     <TableHead className="text-right">Action</TableHead>
                                 </TableRow>
@@ -187,8 +234,11 @@ export default function HalfSangamPage({ params }: { params: Promise<{ gameId: s
                             <TableBody>
                                 {bids.map(bid => (
                                     <TableRow key={bid.id}>
-                                        <TableCell className="font-mono">{bid.openPatti}</TableCell>
-                                        <TableCell className="font-mono">{bid.closeJodi}</TableCell>
+                                        <TableCell className="text-xs text-muted-foreground whitespace-nowrap">
+                                            {bid.sangamType === 'open_patti_close_ank' ? 'Patti + Ank' : 'Ank + Patti'}
+                                        </TableCell>
+                                        <TableCell className="font-mono">{bid.openNumber}</TableCell>
+                                        <TableCell className="font-mono">{bid.closeNumber}</TableCell>
                                         <TableCell>₹{bid.amount}</TableCell>
                                         <TableCell className="text-right">
                                             <Button variant="ghost" size="icon" onClick={() => removeBid(bid.id)}>

@@ -2,6 +2,14 @@
 
 import { z } from 'zod';
 import { cookies } from 'next/headers';
+import {
+  VALID_ANK,
+  VALID_JODI,
+  VALID_SINGLE_PATTI,
+  VALID_DOUBLE_PATTI,
+  VALID_TRIPLE_PATTI,
+  ALL_VALID_PATTIS
+} from '@/lib/matka-rules';
 
 const betSchema = z.object({
   id: z.number(),
@@ -13,36 +21,31 @@ const betSchema = z.object({
 
 const halfSangamBetSchema = z.object({
   id: z.number(),
-  openPatti: z.string().regex(/^\d{3}$/, "Invalid Open Patti"),
-  closeJodi: z.string().regex(/^\d{2}$/, "Invalid Close Jodi"),
+  openNumber: z.string(),
+  closeNumber: z.string(),
   amount: z.string().regex(/^[1-9]\d*$/, "Invalid amount"),
-});
+}).refine(data => {
+  const isOpenPatti = ALL_VALID_PATTIS.has(data.openNumber);
+  const isCloseAnk = VALID_ANK.has(data.closeNumber);
+  const isOpenAnk = VALID_ANK.has(data.openNumber);
+  const isClosePatti = ALL_VALID_PATTIS.has(data.closeNumber);
+  return (isOpenPatti && isCloseAnk) || (isOpenAnk && isClosePatti);
+}, "Invalid Half Sangam combination. Must be Open Patti + Close Ank OR Open Ank + Close Patti.");
 
 const fullSangamBetSchema = z.object({
   id: z.number(),
-  openPatti: z.string().regex(/^\d{3}$/, "Invalid Open Patti"),
-  closePatti: z.string().regex(/^\d{3}$/, "Invalid Close Patti"),
+  openPatti: z.string().refine(val => ALL_VALID_PATTIS.has(val), "Invalid Open Patti"),
+  closePatti: z.string().refine(val => ALL_VALID_PATTIS.has(val), "Invalid Close Patti"),
   amount: z.string().regex(/^[1-9]\d*$/, "Invalid amount"),
 });
 
 const betTypeValidations: { [key: string]: (numStr: string) => boolean } = {
-  'ank': (numStr) => /^\d$/.test(numStr),
-  'jodi': (numStr) => /^\d{2}$/.test(numStr),
-  'patti': (numStr) => /^\d{3}$/.test(numStr),
-  'single-patti': (numStr) => {
-    if (!/^\d{3}$/.test(numStr)) return false;
-    const digits = numStr.split('');
-    return new Set(digits).size === 3;
-  },
-  'double-patti': (numStr) => {
-    if (!/^\d{3}$/.test(numStr)) return false;
-    const digits = numStr.split('');
-    return new Set(digits).size === 2;
-  },
-  'triple-patti': (numStr) => {
-    if (!/^\d{3}$/.test(numStr)) return false;
-    return new Set(numStr.split('')).size === 1;
-  },
+  'ank': (numStr) => VALID_ANK.has(numStr),
+  'jodi': (numStr) => VALID_JODI.has(numStr),
+  'patti': (numStr) => ALL_VALID_PATTIS.has(numStr),
+  'single-patti': (numStr) => VALID_SINGLE_PATTI.has(numStr),
+  'double-patti': (numStr) => VALID_DOUBLE_PATTI.has(numStr),
+  'triple-patti': (numStr) => VALID_TRIPLE_PATTI.has(numStr),
 };
 
 type SubmitBetsState = {
@@ -169,7 +172,7 @@ export async function submitHalfSangamBids(
       records.push({
         betType: 'half-sangam',
         market: 'sangam',
-        number: `${bid.openPatti}-${bid.closeJodi}`,
+        number: `${bid.openNumber}-${bid.closeNumber}`,
         amount: amt
       });
     }
