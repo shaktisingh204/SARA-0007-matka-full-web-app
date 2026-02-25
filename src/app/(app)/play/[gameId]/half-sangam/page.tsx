@@ -1,6 +1,5 @@
 'use client';
-import { games } from '@/lib/data';
-import { notFound, useParams } from 'next/navigation';
+import { notFound } from 'next/navigation';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -34,12 +33,14 @@ function SubmitButton() {
     );
 }
 
-export default function HalfSangamPage() {
-    const params = useParams();
-    const { toast } = useToast();
-    const { gameId } = params;
+import { getGames } from '@/app/actions/games';
 
-    const game = games.find((g) => g.id === gameId);
+export default function HalfSangamPage({ params }: { params: Promise<{ gameId: string }> }) {
+    const { toast } = useToast();
+
+    const [game, setGame] = useState<any>(null);
+    const [gameId, setGameId] = useState<string>('');
+    const [loading, setLoading] = useState(true);
 
     const [openPatti, setOpenPatti] = useState('');
     const [closeJodi, setCloseJodi] = useState('');
@@ -48,6 +49,22 @@ export default function HalfSangamPage() {
 
     const initialState = { error: undefined, success: undefined };
     const [state, dispatch] = useFormState(submitHalfSangamBids, initialState);
+
+    useEffect(() => {
+        async function loadParamsAndGame() {
+            const resolvedParams = await params;
+            setGameId(resolvedParams.gameId);
+
+            const result = await getGames();
+            if (result.success && result.data) {
+                const found = result.data.find((g: any) => g.id === resolvedParams.gameId);
+                if (found) setGame(found);
+            }
+
+            setLoading(false);
+        }
+        loadParamsAndGame();
+    }, [params]);
 
     useEffect(() => {
         if (state.error) {
@@ -63,7 +80,8 @@ export default function HalfSangamPage() {
     }, [state, toast, bids.length]);
 
     if (!game) {
-        notFound();
+        if (!loading) notFound();
+        return null;
     }
 
     const validateAndAddBid = () => {

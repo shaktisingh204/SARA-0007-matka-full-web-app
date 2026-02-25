@@ -18,14 +18,15 @@ const GameSchema = new mongoose.Schema({
 const Game = mongoose.models.Game || mongoose.model('Game', GameSchema);
 
 const dummyGames = [
-    { name: 'MILAN MORNING', open_time: '10:15 AM', close_time: '11:15 AM' },
-    { name: 'KALYAN MORNING', open_time: '11:00 AM', close_time: '12:02 PM' },
-    { name: 'MILAN DAY', open_time: '03:10 PM', close_time: '05:10 PM' },
-    { name: 'RAJDHANI DAY', open_time: '03:15 PM', close_time: '05:15 PM' },
-    { name: 'KALYAN', open_time: '04:15 PM', close_time: '06:15 PM' },
-    { name: 'MILAN NIGHT', open_time: '09:05 PM', close_time: '11:05 PM' },
-    { name: 'RAJDHANI NIGHT', open_time: '09:25 PM', close_time: '11:35 PM' },
-    { name: 'MAIN BAZAR', open_time: '09:35 PM', close_time: '12:05 AM' },
+    { name: 'MILAN MORNING', open_time: '10:15', close_time: '11:15' },
+    { name: 'KALYAN MORNING', open_time: '11:00', close_time: '12:02' },
+    { name: 'MILAN DAY', open_time: '15:10', close_time: '17:10' },
+    { name: 'RAJDHANI DAY', open_time: '15:15', close_time: '17:15' },
+    { name: 'KALYAN', open_time: '16:15', close_time: '18:15' },
+    { name: 'MILAN NIGHT', open_time: '21:05', close_time: '23:05' },
+    { name: 'RAJDHANI NIGHT', open_time: '21:25', close_time: '23:35' },
+    { name: 'MAIN BAZAR', open_time: '21:35', close_time: '23:59' },
+    { name: 'ALWAYS OPEN', open_time: '00:00', close_time: '23:59' },
 ];
 
 async function seed() {

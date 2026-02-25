@@ -1,6 +1,5 @@
 'use client';
-import { games } from '@/lib/data';
-import { notFound, useParams } from 'next/navigation';
+import { notFound } from 'next/navigation';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -13,7 +12,10 @@ import { Trash2, Loader2, CheckCircle } from 'lucide-react';
 import { useFormState, useFormStatus } from 'react-dom';
 import { submitBids } from '@/app/actions/bets';
 
+import { getGames } from '@/app/actions/games';
+
 const betTypes: { [key: string]: { name: string, description: string, minLength: number, maxLength: number, validation: (numStr: string) => boolean, validationMessage: string } } = {
+  // ... schemas remaining same
   'ank': {
     name: 'Single (Ank)',
     description: 'Enter a single digit from 0-9',
@@ -99,12 +101,31 @@ function SubmitButton() {
 }
 
 
-export default function PlaceBetPage() {
-  const params = useParams();
+export default function PlaceBetPage({ params }: { params: Promise<{ gameId: string, betType: string }> }) {
   const { toast } = useToast();
-  const { gameId, betType: betTypeParam } = params;
 
-  const game = games.find((g) => g.id === gameId);
+  const [game, setGame] = useState<any>(null);
+  const [gameId, setGameId] = useState<string>('');
+  const [betTypeParam, setBetTypeParam] = useState<string>('');
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function loadParamsAndGame() {
+      const resolvedParams = await params;
+      setGameId(resolvedParams.gameId);
+      setBetTypeParam(resolvedParams.betType);
+
+      const result = await getGames();
+      if (result.success && result.data) {
+        const found = result.data.find((g: any) => g.id === resolvedParams.gameId);
+        if (found) setGame(found);
+      }
+
+      setLoading(false);
+    }
+    loadParamsAndGame();
+  }, [params]);
+
   const betTypeKey = typeof betTypeParam === 'string' ? betTypeParam : '';
   const betType = betTypes[betTypeKey];
   const isJodi = betTypeParam === 'jodi';
