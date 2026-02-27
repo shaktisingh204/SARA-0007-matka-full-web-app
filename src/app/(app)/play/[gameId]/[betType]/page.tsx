@@ -13,6 +13,7 @@ import { useFormState, useFormStatus } from 'react-dom';
 import { submitBids } from '@/app/actions/bets';
 import { getGames } from '@/app/actions/games';
 import { useUserProfileStore } from '@/lib/store';
+import { isGameOpen } from '@/lib/utils';
 
 import {
   getValidAnk,
@@ -134,7 +135,12 @@ export default function PlaceBetPage({ params }: { params: Promise<{ gameId: str
       const result = await getGames();
       if (result.success && result.data) {
         const found = result.data.find((g: any) => g.id === resolvedParams.gameId);
-        if (found) setGame(found);
+        if (found) {
+          setGame(found);
+          if (resolvedParams.betType !== 'jodi' && !isGameOpen(found.open_time)) {
+            setMarket('close');
+          }
+        }
       }
 
       setLoading(false);
@@ -224,10 +230,12 @@ export default function PlaceBetPage({ params }: { params: Promise<{ gameId: str
             <div className="space-y-2">
               <Label>Market</Label>
               <RadioGroup value={market} onValueChange={(value: 'open' | 'close') => setMarket(value)} className="flex gap-4">
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="open" id="open" />
-                  <Label htmlFor="open">Open</Label>
-                </div>
+                {isGameOpen(game.open_time) && (
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="open" id="open" />
+                    <Label htmlFor="open">Open</Label>
+                  </div>
+                )}
                 <div className="flex items-center space-x-2">
                   <RadioGroupItem value="close" id="close" />
                   <Label htmlFor="close">Close</Label>
