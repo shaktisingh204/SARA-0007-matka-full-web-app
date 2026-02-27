@@ -12,6 +12,7 @@ import { useFormState, useFormStatus } from 'react-dom';
 import { submitFullSangamBids } from '@/app/actions/bets';
 import { getGames } from '@/app/actions/games';
 import { ALL_VALID_PATTIS } from '@/lib/matka-rules';
+import { useUserProfileStore } from '@/lib/store';
 
 type Bid = {
     id: number;
@@ -37,6 +38,7 @@ function SubmitButton() {
 
 export default function FullSangamPage({ params }: { params: Promise<{ gameId: string }> }) {
     const { toast } = useToast();
+    const updateBalance = useUserProfileStore((state) => state.updateBalance);
 
     const [game, setGame] = useState<any>(null);
     const [gameId, setGameId] = useState<string>('');
@@ -75,6 +77,7 @@ export default function FullSangamPage({ params }: { params: Promise<{ gameId: s
                 title: 'Bids Submitted', description: `${bids.length} Full Sangam bids have been successfully placed.`,
                 action: <CheckCircle className="h-5 w-5 text-green-500" />
             });
+            if (state.newBalance) updateBalance(state.newBalance);
             setBids([]);
         }
     }, [state, toast, bids.length]);

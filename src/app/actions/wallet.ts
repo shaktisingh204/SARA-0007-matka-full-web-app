@@ -69,7 +69,7 @@ export async function getWalletData(): Promise<WalletDataResult> {
     }
 }
 
-export async function requestDeposit(prevState: ActionState, formData: FormData): Promise<ActionState> {
+export async function requestDeposit(prevState: ActionState, formData: FormData): Promise<ActionState & { newBalance?: string }> {
     const amountStr = formData.get('amount') as string;
     const amount = parseFloat(amountStr);
 
@@ -93,9 +93,9 @@ export async function requestDeposit(prevState: ActionState, formData: FormData)
         await connectToDatabase();
 
         // Create deposit transaction AND update user balance
-        await User.findByIdAndUpdate(payload.userId, {
+        const updatedUser = await User.findByIdAndUpdate(payload.userId, {
             $inc: { wallet_balance: amount },
-        });
+        }, { new: true });
 
         await TransactionModel.create({
             userId: payload.userId,
@@ -106,14 +106,14 @@ export async function requestDeposit(prevState: ActionState, formData: FormData)
         });
 
         revalidatePath('/wallet');
-        return { success: true };
+        return { success: true, newBalance: updatedUser?.wallet_balance.toString() };
     } catch (e) {
         console.error('Deposit Error:', e);
         return { error: 'An error occurred during deposit.' };
     }
 }
 
-export async function requestWithdrawal(prevState: ActionState, formData: FormData): Promise<ActionState> {
+export async function requestWithdrawal(prevState: ActionState, formData: FormData): Promise<ActionState & { newBalance?: string }> {
     const amountStr = formData.get('amount') as string;
     const amount = parseFloat(amountStr);
 
@@ -137,13 +137,13 @@ export async function requestWithdrawal(prevState: ActionState, formData: FormDa
         await connectToDatabase();
 
         // Atomic check for sufficient balance
-        const user = await User.findOneAndUpdate(
+        const updatedUser = await User.findOneAndUpdate(
             { _id: payload.userId, wallet_balance: { $gte: amount } },
             { $inc: { wallet_balance: -amount } },
             { new: true }
         );
 
-        if (!user) {
+        if (!updatedUser) {
             return { error: 'Insufficient wallet balance.' };
         }
 
@@ -156,7 +156,7 @@ export async function requestWithdrawal(prevState: ActionState, formData: FormDa
         });
 
         revalidatePath('/wallet');
-        return { success: true };
+        return { success: true, newBalance: updatedUser.wallet_balance.toString() };
     } catch (e) {
         console.error('Withdrawal Error:', e);
         return { error: 'An error occurred during withdrawal.' };

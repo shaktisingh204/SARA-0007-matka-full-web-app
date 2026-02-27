@@ -11,8 +11,8 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Trash2, Loader2, CheckCircle } from 'lucide-react';
 import { useFormState, useFormStatus } from 'react-dom';
 import { submitBids } from '@/app/actions/bets';
-
 import { getGames } from '@/app/actions/games';
+import { useUserProfileStore } from '@/lib/store';
 
 import {
   getValidAnk,
@@ -118,6 +118,7 @@ function SubmitButton() {
 
 export default function PlaceBetPage({ params }: { params: Promise<{ gameId: string, betType: string }> }) {
   const { toast } = useToast();
+  const updateBalance = useUserProfileStore((state) => state.updateBalance);
 
   const [game, setGame] = useState<any>(null);
   const [gameId, setGameId] = useState<string>('');
@@ -162,6 +163,7 @@ export default function PlaceBetPage({ params }: { params: Promise<{ gameId: str
         title: 'Bids Submitted', description: `${bids.length} bids have been successfully placed.`,
         action: <CheckCircle className="h-5 w-5 text-green-500" />
       });
+      if (state.newBalance) updateBalance(state.newBalance);
       setBids([]);
     }
   }, [state, toast, bids.length]);

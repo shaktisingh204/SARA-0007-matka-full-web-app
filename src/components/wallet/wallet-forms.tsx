@@ -20,9 +20,11 @@ import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
 import type { Transaction } from '@/lib/types';
 import { requestDeposit, requestWithdrawal } from '@/app/actions/wallet';
+import { useUserProfileStore } from '@/lib/store';
 
 export function WalletForms({ initialBalance, transactions }: { initialBalance: number, transactions: Transaction[] }) {
   const { toast } = useToast();
+  const updateBalance = useUserProfileStore((state) => state.updateBalance);
   const [depositState, depositAction, isDepositing] = useActionState(requestDeposit, {});
   const [withdrawalState, withdrawalAction, isWithdrawing] = useActionState(requestWithdrawal, {});
 
@@ -35,6 +37,7 @@ export function WalletForms({ initialBalance, transactions }: { initialBalance: 
         title: 'Deposit Successful',
         description: 'Your deposit has been processed.',
       });
+      if (depositState.newBalance) updateBalance(depositState.newBalance);
       depositFormRef.current?.reset();
     } else if (depositState.error) {
       toast({
@@ -51,6 +54,7 @@ export function WalletForms({ initialBalance, transactions }: { initialBalance: 
         title: 'Withdrawal Successful',
         description: 'Your withdrawal has been processed.',
       });
+      if (withdrawalState.newBalance) updateBalance(withdrawalState.newBalance);
       withdrawalFormRef.current?.reset();
     } else if (withdrawalState.error) {
       toast({

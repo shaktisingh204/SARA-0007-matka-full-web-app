@@ -14,6 +14,7 @@ import { submitHalfSangamBids } from '@/app/actions/bets';
 import { getGames } from '@/app/actions/games';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { ALL_VALID_PATTIS, VALID_ANK } from '@/lib/matka-rules';
+import { useUserProfileStore } from '@/lib/store';
 
 type Bid = {
     id: number;
@@ -40,6 +41,7 @@ function SubmitButton() {
 
 export default function HalfSangamPage({ params }: { params: Promise<{ gameId: string }> }) {
     const { toast } = useToast();
+    const updateBalance = useUserProfileStore((state) => state.updateBalance);
 
     const [game, setGame] = useState<any>(null);
     const [gameId, setGameId] = useState<string>('');
@@ -79,6 +81,7 @@ export default function HalfSangamPage({ params }: { params: Promise<{ gameId: s
                 title: 'Bids Submitted', description: `${bids.length} Half Sangam bids have been successfully placed.`,
                 action: <CheckCircle className="h-5 w-5 text-green-500" />
             });
+            if (state.newBalance) updateBalance(state.newBalance);
             setBids([]);
         }
     }, [state, toast, bids.length]);

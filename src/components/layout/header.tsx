@@ -17,18 +17,34 @@ export function Header() {
   const router = useRouter();
 
   useEffect(() => {
+    let intervalId: NodeJS.Timeout;
+
     async function fetchUserDetails() {
-      // Fetch details only if authenticated and profile is not already loaded
-      if (isAuthenticated && !userProfile) {
+      if (isAuthenticated) {
         const result = await getUserDetails();
         if (result.success && result.data) {
+          // If the balance changed or profile is completely new, update it.
+          // This ensures the header natively reflects DB changes (e.g., from another tab or admin deduction).
           setUserProfile(result.data);
         } else {
           console.error('Failed to fetch user details:', result.error);
         }
       }
     }
-    fetchUserDetails();
+
+    // Initial fetch if we don't have the profile yet but are authenticated
+    if (isAuthenticated && !userProfile) {
+      fetchUserDetails();
+    }
+
+    // Set up polling every 10 seconds to keep balance "Live"
+    if (isAuthenticated) {
+      intervalId = setInterval(fetchUserDetails, 10000);
+    }
+
+    return () => {
+      if (intervalId) clearInterval(intervalId);
+    };
   }, [isAuthenticated, userProfile, setUserProfile]);
 
   const handleLogout = async () => {

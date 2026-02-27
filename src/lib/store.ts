@@ -67,6 +67,7 @@ type UserProfileState = {
 type UserProfileActions = {
   setUserProfile: (profile: UserProfile) => void;
   clearUserProfile: () => void;
+  updateBalance: (newBalance: string) => void;
 };
 
 export const useUserProfileStore = create(
@@ -75,10 +76,13 @@ export const useUserProfileStore = create(
       userProfile: null,
       setUserProfile: (profile) => set({ userProfile: profile }),
       clearUserProfile: () => set({ userProfile: null }),
+      updateBalance: (newBalance: string) => set((state) => ({
+        userProfile: state.userProfile ? { ...state.userProfile, wallet_balance: newBalance } : null
+      })),
     }),
     {
-      name: 'user-profile-storage', 
-      storage: createJSONStorage(() => sessionStorage), 
+      name: 'user-profile-storage',
+      storage: createJSONStorage(() => sessionStorage),
     }
   )
 );
@@ -93,10 +97,10 @@ export const useAppStore = create<AppState & AppActions>((set) => ({
 
 
 export const useAuthStore = create<AuthState & AuthActions>((set) => ({
-    token: null,
-    setToken: (token) => set({ token }),
-    logout: () => {
-      Cookies.remove('auth_token');
-      set({ token: null })
-    },
+  token: null,
+  setToken: (token) => set({ token }),
+  logout: () => {
+    Cookies.remove('auth_token');
+    set({ token: null })
+  },
 }));

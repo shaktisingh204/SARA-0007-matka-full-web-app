@@ -23,12 +23,12 @@ import { Calendar as CalendarIcon, FilterX, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
 import { getBids } from '@/app/actions/bids';
-import { useUser } from '@/hooks/use-user';
+import { useUserProfileStore } from '@/lib/store';
 
 const betStatuses = ['Win', 'Loss', 'Pending'];
 
 export function BidsHistoryClient() {
-  const { user } = useUser();
+  const user = useUserProfileStore((state) => state.userProfile);
   const [allBids, setAllBids] = React.useState<Bid[]>([]);
   const [loading, setLoading] = React.useState(true);
   const [date, setDate] = React.useState<DateRange | undefined>({
@@ -61,7 +61,7 @@ export function BidsHistoryClient() {
       const isDateInRange = fromDate && toDate ? (bidDate >= fromDate && bidDate <= toDate) : true;
       const isGameMatch = selectedGame === 'all' || bid.gameName === selectedGame;
       const isStatusMatch = selectedStatus === 'all' || bid.status === selectedStatus;
-      
+
       return isDateInRange && isGameMatch && isStatusMatch;
     });
     setFilteredBids(filtered);
@@ -76,13 +76,13 @@ export function BidsHistoryClient() {
     setSelectedGame('all');
     setSelectedStatus('all');
   }
-  
+
   const getStatusVariant = (status: 'Win' | 'Loss' | 'Pending'): 'default' | 'destructive' | 'secondary' => {
-      switch (status) {
-          case 'Win': return 'default';
-          case 'Loss': return 'destructive';
-          case 'Pending': return 'secondary';
-      }
+    switch (status) {
+      case 'Win': return 'default';
+      case 'Loss': return 'destructive';
+      case 'Pending': return 'secondary';
+    }
   }
 
   return (
@@ -130,12 +130,12 @@ export function BidsHistoryClient() {
               <SelectValue placeholder="Select a game" />
             </SelectTrigger>
             <SelectContent>
-                <SelectItem value="all">All Games</SelectItem>
-                {games.map((game) => (
-                    <SelectItem key={game.id} value={game.name}>
-                        {game.name}
-                    </SelectItem>
-                ))}
+              <SelectItem value="all">All Games</SelectItem>
+              {games.map((game) => (
+                <SelectItem key={game.id} value={game.name}>
+                  {game.name}
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
           <Select value={selectedStatus} onValueChange={setSelectedStatus}>
@@ -143,12 +143,12 @@ export function BidsHistoryClient() {
               <SelectValue placeholder="Select status" />
             </SelectTrigger>
             <SelectContent>
-                <SelectItem value="all">All Statuses</SelectItem>
-                {betStatuses.map((status) => (
-                    <SelectItem key={status} value={status}>
-                        {status}
-                    </SelectItem>
-                ))}
+              <SelectItem value="all">All Statuses</SelectItem>
+              {betStatuses.map((status) => (
+                <SelectItem key={status} value={status}>
+                  {status}
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
           <Button onClick={clearFilters} variant="ghost" className="w-full md:w-auto">
@@ -159,47 +159,47 @@ export function BidsHistoryClient() {
       </CardHeader>
       <CardContent>
         {loading ? (
-            <div className="flex justify-center items-center h-48">
-                <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-            </div>
+          <div className="flex justify-center items-center h-48">
+            <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+          </div>
         ) : (
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Date</TableHead>
-              <TableHead>Game</TableHead>
-              <TableHead>Bet Details</TableHead>
-              <TableHead className="text-right">Amount</TableHead>
-              <TableHead className="text-right">Status</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {filteredBids.length > 0 ? (
-              filteredBids.map(bid => (
-                <TableRow key={bid.id}>
-                  <TableCell>{format(new Date(bid.date), 'dd/MM/yy, hh:mm a')}</TableCell>
-                  <TableCell className="font-medium">{bid.gameName}</TableCell>
-                  <TableCell>
-                    <div className="flex flex-col">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Date</TableHead>
+                <TableHead>Game</TableHead>
+                <TableHead>Bet Details</TableHead>
+                <TableHead className="text-right">Amount</TableHead>
+                <TableHead className="text-right">Status</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {filteredBids.length > 0 ? (
+                filteredBids.map(bid => (
+                  <TableRow key={bid.id}>
+                    <TableCell>{format(new Date(bid.date), 'dd/MM/yy, hh:mm a')}</TableCell>
+                    <TableCell className="font-medium">{bid.gameName}</TableCell>
+                    <TableCell>
+                      <div className="flex flex-col">
                         <span className="font-bold">{bid.betType} ({bid.market})</span>
                         <span className="font-mono text-primary">{bid.number}</span>
-                    </div>
-                  </TableCell>
-                  <TableCell className="text-right font-semibold">₹{bid.amount.toFixed(2)}</TableCell>
-                  <TableCell className="text-right">
-                    <Badge variant={getStatusVariant(bid.status)}>{bid.status}</Badge>
+                      </div>
+                    </TableCell>
+                    <TableCell className="text-right font-semibold">₹{bid.amount.toFixed(2)}</TableCell>
+                    <TableCell className="text-right">
+                      <Badge variant={getStatusVariant(bid.status)}>{bid.status}</Badge>
+                    </TableCell>
+                  </TableRow>
+                ))
+              ) : (
+                <TableRow>
+                  <TableCell colSpan={5} className="h-24 text-center">
+                    No bids found for the selected filters.
                   </TableCell>
                 </TableRow>
-              ))
-            ) : (
-              <TableRow>
-                <TableCell colSpan={5} className="h-24 text-center">
-                  No bids found for the selected filters.
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
+              )}
+            </TableBody>
+          </Table>
         )}
       </CardContent>
     </Card>

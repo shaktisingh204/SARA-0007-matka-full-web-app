@@ -51,6 +51,7 @@ const betTypeValidations: { [key: string]: (numStr: string) => boolean } = {
 type SubmitBetsState = {
   success?: boolean;
   error?: string;
+  newBalance?: string;
 }
 
 async function processTransaction(bids: any[], totalAmount: number, gameName: string) {
@@ -119,7 +120,7 @@ async function processTransaction(bids: any[], totalAmount: number, gameName: st
     status: 'Approved',
   });
 
-  return { success: true };
+  return { success: true, newBalance: user.wallet_balance.toString() };
 }
 
 export async function submitBids(
@@ -167,7 +168,7 @@ export async function submitBids(
     const txResult = await processTransaction(records, totalAmount, gameName);
     if (txResult.error) return { error: txResult.error };
 
-    return { success: true };
+    return { success: true, newBalance: txResult.newBalance };
 
   } catch (e) {
     console.error('Submit Bids Error:', e);
@@ -210,7 +211,7 @@ export async function submitHalfSangamBids(
     const txResult = await processTransaction(records, totalAmount, gameName);
     if (txResult.error) return { error: txResult.error };
 
-    return { success: true };
+    return { success: true, newBalance: txResult.newBalance };
   } catch (e) {
     console.error('Submit Half Sangam Error:', e);
     return { error: 'An unexpected error occurred.' };
@@ -252,7 +253,7 @@ export async function submitFullSangamBids(
     const txResult = await processTransaction(records, totalAmount, gameName);
     if (txResult.error) return { error: txResult.error };
 
-    return { success: true };
+    return { success: true, newBalance: txResult.newBalance };
   } catch (e) {
     console.error('Submit Full Sangam Error:', e);
     return { error: 'An unexpected error occurred.' };
