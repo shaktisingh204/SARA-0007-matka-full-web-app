@@ -1,6 +1,6 @@
-
 'use client';
 
+import { useActionState, useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -15,26 +15,53 @@ import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { IndianRupee, ArrowDownCircle, ArrowUpCircle } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { transactions } from '@/lib/data';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
+import type { Transaction } from '@/lib/types';
+import { requestDeposit, requestWithdrawal } from '@/app/actions/wallet';
 
-export function WalletForms() {
+export function WalletForms({ initialBalance, transactions }: { initialBalance: number, transactions: Transaction[] }) {
   const { toast } = useToast();
-  const recentTransactions = transactions.slice(0, 5);
+  const [depositState, depositAction, isDepositing] = useActionState(requestDeposit, {});
+  const [withdrawalState, withdrawalAction, isWithdrawing] = useActionState(requestWithdrawal, {});
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>, type: 'Deposit' | 'Withdrawal') => {
-    event.preventDefault();
-    const amount = event.currentTarget.amount.value;
-    if (amount) {
+  const depositFormRef = useRef<HTMLFormElement>(null);
+  const withdrawalFormRef = useRef<HTMLFormElement>(null);
+
+  useEffect(() => {
+    if (depositState.success) {
       toast({
-        title: `${type} Successful`,
-        description: `₹${amount} has been processed.`,
+        title: 'Deposit Successful',
+        description: 'Your deposit has been processed.',
       });
-      event.currentTarget.reset();
+      depositFormRef.current?.reset();
+    } else if (depositState.error) {
+      toast({
+        title: 'Deposit Failed',
+        description: depositState.error,
+        variant: 'destructive',
+      });
     }
-  }
+  }, [depositState, toast]);
+
+  useEffect(() => {
+    if (withdrawalState.success) {
+      toast({
+        title: 'Withdrawal Successful',
+        description: 'Your withdrawal has been processed.',
+      });
+      withdrawalFormRef.current?.reset();
+    } else if (withdrawalState.error) {
+      toast({
+        title: 'Withdrawal Failed',
+        description: withdrawalState.error,
+        variant: 'destructive',
+      });
+    }
+  }, [withdrawalState, toast]);
+
+  const lastTx = transactions[0];
 
   return (
     <div className="space-y-8">
@@ -49,12 +76,16 @@ export function WalletForms() {
           <CardContent className="space-y-4">
             <div>
               <p className="text-sm text-muted-foreground">Current Balance</p>
-              <p className="font-headline text-5xl font-bold tracking-tighter">₹1,250.75</p>
+              <p className="font-headline text-5xl font-bold tracking-tighter">₹{initialBalance.toFixed(2)}</p>
             </div>
-            <div>
-              <p className="text-sm text-muted-foreground">Last Transaction</p>
-              <p className="text-lg font-medium">+ ₹500.00 (Deposit)</p>
-            </div>
+            {lastTx && (
+              <div>
+                <p className="text-sm text-muted-foreground">Last Transaction</p>
+                <p className="text-lg font-medium">
+                  {lastTx.type === 'credit' ? '+' : '-'} ₹{lastTx.amount.toFixed(2)} ({lastTx.description})
+                </p>
+              </div>
+            )}
           </CardContent>
         </Card>
 
@@ -69,7 +100,7 @@ export function WalletForms() {
           </TabsList>
           <TabsContent value="deposit">
             <Card>
-              <form onSubmit={(e) => handleSubmit(e, 'Deposit')}>
+              <form ref={depositFormRef} action={depositAction}>
                 <CardHeader>
                   <CardTitle>Deposit Funds</CardTitle>
                   <CardDescription>
@@ -78,22 +109,24 @@ export function WalletForms() {
                 </CardHeader>
                 <CardContent className="space-y-2">
                   <div className="space-y-1">
-                    <Label htmlFor="amount">Amount</Label>
+                    <Label htmlFor="deposit-amount">Amount</Label>
                     <div className="relative">
                       <IndianRupee className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                      <Input id="amount" name="amount" type="number" placeholder="0.00" className="pl-8" required />
+                      <Input id="deposit-amount" name="amount" type="number" placeholder="0.00" className="pl-8" required min="1" step="any" />
                     </div>
                   </div>
                 </CardContent>
                 <CardFooter>
-                  <Button className="w-full">Deposit</Button>
+                  <Button type="submit" className="w-full" disabled={isDepositing}>
+                    {isDepositing ? 'Processing...' : 'Deposit'}
+                  </Button>
                 </CardFooter>
               </form>
             </Card>
           </TabsContent>
           <TabsContent value="withdrawal">
             <Card>
-              <form onSubmit={(e) => handleSubmit(e, 'Withdrawal')}>
+              <form ref={withdrawalFormRef} action={withdrawalAction}>
                 <CardHeader>
                   <CardTitle>Withdraw Winnings</CardTitle>
                   <CardDescription>
@@ -102,15 +135,17 @@ export function WalletForms() {
                 </CardHeader>
                 <CardContent className="space-y-2">
                   <div className="space-y-1">
-                    <Label htmlFor="amount">Amount</Label>
-                     <div className="relative">
+                    <Label htmlFor="withdrawal-amount">Amount</Label>
+                    <div className="relative">
                       <IndianRupee className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                      <Input id="amount" name="amount" type="number" placeholder="0.00" className="pl-8" required />
+                      <Input id="withdrawal-amount" name="amount" type="number" placeholder="0.00" className="pl-8" required min="1" step="any" />
                     </div>
                   </div>
                 </CardContent>
                 <CardFooter>
-                  <Button className="w-full">Withdraw</Button>
+                  <Button type="submit" className="w-full" disabled={isWithdrawing}>
+                    {isWithdrawing ? 'Processing...' : 'Withdraw'}
+                  </Button>
                 </CardFooter>
               </form>
             </Card>
@@ -123,31 +158,35 @@ export function WalletForms() {
           <CardTitle className="font-headline">Recent Transactions</CardTitle>
         </CardHeader>
         <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Date</TableHead>
-                <TableHead>Description</TableHead>
-                <TableHead className="text-right">Amount</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {recentTransactions.map((transaction) => (
-                <TableRow key={transaction.id}>
-                  <TableCell>{format(new Date(transaction.date), 'dd MMM, yyyy')}</TableCell>
-                  <TableCell>{transaction.description}</TableCell>
-                  <TableCell
-                    className={cn(
-                      'text-right font-semibold',
-                      transaction.type === 'credit' ? 'text-green-600' : 'text-destructive'
-                    )}
-                  >
-                    {transaction.type === 'credit' ? '+' : '-'}₹{transaction.amount.toFixed(2)}
-                  </TableCell>
+          {transactions.length === 0 ? (
+            <p className="text-center text-muted-foreground py-8">No transactions found.</p>
+          ) : (
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Date</TableHead>
+                  <TableHead>Description</TableHead>
+                  <TableHead className="text-right">Amount</TableHead>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+              </TableHeader>
+              <TableBody>
+                {transactions.map((transaction) => (
+                  <TableRow key={transaction.id}>
+                    <TableCell>{format(new Date(transaction.date), 'dd MMM, yyyy')}</TableCell>
+                    <TableCell>{transaction.description}</TableCell>
+                    <TableCell
+                      className={cn(
+                        'text-right font-semibold',
+                        transaction.type === 'credit' ? 'text-green-600' : 'text-destructive'
+                      )}
+                    >
+                      {transaction.type === 'credit' ? '+' : '-'}₹{transaction.amount.toFixed(2)}
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          )}
         </CardContent>
       </Card>
     </div>

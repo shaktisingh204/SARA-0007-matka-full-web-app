@@ -8,7 +8,7 @@ const predictionSchema = z.object({
   pastResults: z.string().optional(),
 });
 
-type PredictionState = {
+export type PredictionState = {
   predictions?: number[];
   confidence?: number;
   error?: string;
@@ -26,13 +26,13 @@ export async function getPredictions(
   if (!validatedFields.success) {
     return { error: 'Invalid input.' };
   }
-  
+
   try {
     const input: GenerateNumberPredictionsInput = {
       gameType: validatedFields.data.gameType,
       pastResults: validatedFields.data.pastResults || 'No past results provided.',
     };
-    
+
     // Simulate AI call
     // In a real scenario, you would uncomment the following lines:
     // const result = await generateNumberPredictions(input);
@@ -42,7 +42,7 @@ export async function getPredictions(
     await new Promise(resolve => setTimeout(resolve, 1500));
     const mockPredictions = Array.from({ length: 3 }, () => Math.floor(Math.random() * 100));
     const mockConfidence = Math.random();
-    
+
     return { predictions: mockPredictions, confidence: mockConfidence };
 
   } catch (e) {

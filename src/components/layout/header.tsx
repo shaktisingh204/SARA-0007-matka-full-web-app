@@ -11,7 +11,8 @@ import { logout as logoutAction } from '@/app/actions/auth';
 
 export function Header() {
   const { toggleSheet } = useAppStore();
-  const { isAuthenticated, logout: logoutFromStore } = useAuthStore();
+  const { token, logout: logoutFromStore } = useAuthStore();
+  const isAuthenticated = !!token;
   const { userProfile, setUserProfile, clearUserProfile } = useUserProfileStore();
   const router = useRouter();
 
@@ -36,7 +37,7 @@ export function Header() {
     clearUserProfile(); // Clear user profile from session storage
     router.push('/login');
   };
-  
+
   return (
     <header className="sticky top-0 z-10 flex h-16 items-center justify-between gap-4 border-b bg-background px-4 md:px-6">
       <div className="flex items-center gap-4">
@@ -48,7 +49,7 @@ export function Header() {
 
       <div className="flex items-center gap-2">
         {isAuthenticated && (
-           <>
+          <>
             <Button variant="ghost" size="icon">
               <Wallet2 className="h-5 w-5" />
               <span className="ml-1 font-bold text-sm">{userProfile?.wallet_balance || '...'}</span>
@@ -57,7 +58,7 @@ export function Header() {
               <Bell className="h-5 w-5" />
               <span className="sr-only">Notifications</span>
             </Button>
-             <Button variant="ghost" size="icon" onClick={handleLogout}>
+            <Button variant="ghost" size="icon" onClick={handleLogout}>
               <LogOut className="h-5 w-5" />
               <span className="sr-only">Logout</span>
             </Button>

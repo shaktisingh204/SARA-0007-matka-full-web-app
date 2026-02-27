@@ -108,3 +108,32 @@ const AppDetailsSchema: Schema = new Schema({
 export const AppDetails: Model<IAppDetails> =
     mongoose.models.AppDetails ||
     mongoose.model<IAppDetails>('AppDetails', AppDetailsSchema);
+
+// Transaction Model
+export interface ITransaction extends Document {
+    userId: mongoose.Types.ObjectId;
+    type: 'credit' | 'debit';
+    amount: number;
+    description: string;
+    status: 'Pending' | 'Approved' | 'Rejected';
+    createdAt: Date;
+    updatedAt: Date;
+}
+
+const TransactionSchema: Schema = new Schema(
+    {
+        userId: { type: Schema.Types.ObjectId, ref: 'User', required: true },
+        type: { type: String, enum: ['credit', 'debit'], required: true },
+        amount: { type: Number, required: true },
+        description: { type: String, required: true },
+        status: {
+            type: String,
+            enum: ['Pending', 'Approved', 'Rejected'],
+            default: 'Approved', // Auto-approved by default for now
+        },
+    },
+    { timestamps: true }
+);
+
+export const Transaction: Model<ITransaction> =
+    mongoose.models.Transaction || mongoose.model<ITransaction>('Transaction', TransactionSchema);

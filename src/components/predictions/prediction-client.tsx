@@ -1,7 +1,7 @@
 'use client';
 
 import { useFormState, useFormStatus } from 'react-dom';
-import { getPredictions } from '@/app/actions/predictions';
+import { getPredictions, PredictionState } from '@/app/actions/predictions';
 import {
   Card,
   CardContent,
@@ -43,7 +43,7 @@ function SubmitButton() {
 }
 
 export function PredictionClient() {
-  const initialState = {};
+  const initialState: PredictionState = {};
   const [state, dispatch] = useFormState(getPredictions, initialState);
 
   return (
@@ -86,7 +86,7 @@ export function PredictionClient() {
           </CardFooter>
         </form>
       </Card>
-      
+
       <div className="flex items-center justify-center">
         {state.predictions ? (
           <Card className="w-full">
@@ -94,23 +94,23 @@ export function PredictionClient() {
               <CardTitle className="font-headline text-center">Prediction Results</CardTitle>
             </CardHeader>
             <CardContent className="space-y-6">
-                <div className="flex justify-around text-center">
-                    {state.predictions.map((num, index) => (
-                        <div key={index}>
-                            <p className="text-sm text-muted-foreground">Prediction {index + 1}</p>
-                            <p className="font-headline text-5xl font-bold text-primary">{String(num).padStart(2, '0')}</p>
-                        </div>
-                    ))}
+              <div className="flex justify-around text-center">
+                {state.predictions.map((num, index) => (
+                  <div key={index}>
+                    <p className="text-sm text-muted-foreground">Prediction {index + 1}</p>
+                    <p className="font-headline text-5xl font-bold text-primary">{String(num).padStart(2, '0')}</p>
+                  </div>
+                ))}
+              </div>
+              {state.confidence !== undefined && (
+                <div className="space-y-2">
+                  <div className="flex justify-between text-sm">
+                    <span className="font-medium">Confidence</span>
+                    <span className="text-muted-foreground">{Math.round(state.confidence * 100)}%</span>
+                  </div>
+                  <Progress value={state.confidence * 100} />
                 </div>
-                {state.confidence !== undefined && (
-                    <div className="space-y-2">
-                        <div className="flex justify-between text-sm">
-                            <span className="font-medium">Confidence</span>
-                            <span className="text-muted-foreground">{Math.round(state.confidence * 100)}%</span>
-                        </div>
-                        <Progress value={state.confidence * 100} />
-                    </div>
-                )}
+              )}
             </CardContent>
           </Card>
         ) : state.error ? (

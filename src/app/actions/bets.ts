@@ -62,7 +62,7 @@ async function processTransaction(bids: any[], totalAmount: number, gameName: st
   // Dynamic imports structure like in other actions
   const { verifyJwtToken } = await import('@/lib/jwt');
   const { default: connectToDatabase } = await import('@/lib/db');
-  const { User, Bid: BidModel } = await import('@/lib/models');
+  const { User, Bid: BidModel, Transaction: TransactionModel } = await import('@/lib/models');
 
   const payload = await verifyJwtToken(token);
   if (!payload || !payload.userId) return { error: 'Invalid or expired authentication token.' };
@@ -88,6 +88,15 @@ async function processTransaction(bids: any[], totalAmount: number, gameName: st
     status: 'Pending'
   }));
   await BidModel.insertMany(records);
+
+  // Insert Transaction for the wallet deduction
+  await TransactionModel.create({
+    userId: payload.userId,
+    type: 'debit',
+    amount: totalAmount,
+    description: `Bid Placed - ${gameName}`,
+    status: 'Approved',
+  });
 
   return { success: true };
 }

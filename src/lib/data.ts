@@ -1,17 +1,17 @@
 import type { Game, Result, ChartData, Transaction, Bid, User } from '@/lib/types';
 
 export const games: Game[] = [
-  { id: 'milan_morning', name: 'Milan Morning', openTime: '10:15', closeTime: '11:15' },
-  { id: 'kalyan_morning', name: 'Kalyan Morning', openTime: '11:00', closeTime: '12:00' },
-  { id: 'madhuri', name: 'Madhuri', openTime: '11:45', closeTime: '12:45' },
-  { id: 'sridevi', name: 'Sridevi', openTime: '11:35', closeTime: '12:35' },
-  { id: 'kalyan', name: 'Kalyan', openTime: '15:45', closeTime: '17:45' },
-  { id: 'milan_night', name: 'Milan Night', openTime: '21:00', closeTime: '23:00' },
-  { id: 'rajdhani_night', name: 'Rajdhani Night', openTime: '21:25', closeTime: '23:35' },
-  { id: 'main_bazar', name: 'Main Bazar', openTime: '21:40', closeTime: '00:05' },
-  { id: 'starline', name: 'Starline', openTime: '24 Hours', closeTime: '' },
-  { id: 'dishawar', name: 'Dishawar', openTime: '24 Hours', closeTime: '' },
-  { id: 'super_day', name: 'Super Day', openTime: '24 Hours', closeTime: '' },
+  { id: 'milan_morning', name: 'Milan Morning', open_time: '10:15', close_time: '11:15' },
+  { id: 'kalyan_morning', name: 'Kalyan Morning', open_time: '11:00', close_time: '12:00' },
+  { id: 'madhuri', name: 'Madhuri', open_time: '11:45', close_time: '12:45' },
+  { id: 'sridevi', name: 'Sridevi', open_time: '11:35', close_time: '12:35' },
+  { id: 'kalyan', name: 'Kalyan', open_time: '15:45', close_time: '17:45' },
+  { id: 'milan_night', name: 'Milan Night', open_time: '21:00', close_time: '23:00' },
+  { id: 'rajdhani_night', name: 'Rajdhani Night', open_time: '21:25', close_time: '23:35' },
+  { id: 'main_bazar', name: 'Main Bazar', open_time: '21:40', close_time: '00:05' },
+  { id: 'starline', name: 'Starline', open_time: '24 Hours', close_time: '' },
+  { id: 'dishawar', name: 'Dishawar', open_time: '24 Hours', close_time: '' },
+  { id: 'super_day', name: 'Super Day', open_time: '24 Hours', close_time: '' },
 ];
 
 export const results: Result[] = [
@@ -24,13 +24,13 @@ export const results: Result[] = [
 ];
 
 export const chartData: ChartData[] = [
-    { date: "Mon", 'Open': 1, 'Close': 2 },
-    { date: "Tue", 'Open': 3, 'Close': 4 },
-    { date: "Wed", 'Open': 5, 'Close': 6 },
-    { date: "Thu", 'Open': 7, 'Close': 8 },
-    { date: "Fri", 'Open': 9, 'Close': 0 },
-    { date: "Sat", 'Open': 1, 'Close': 3 },
-    { date: "Sun", 'Open': 2, 'Close': 5 },
+  { date: "Mon", 'Open': 1, 'Close': 2 },
+  { date: "Tue", 'Open': 3, 'Close': 4 },
+  { date: "Wed", 'Open': 5, 'Close': 6 },
+  { date: "Thu", 'Open': 7, 'Close': 8 },
+  { date: "Fri", 'Open': 9, 'Close': 0 },
+  { date: "Sat", 'Open': 1, 'Close': 3 },
+  { date: "Sun", 'Open': 2, 'Close': 5 },
 ];
 
 export const transactions: Transaction[] = [
@@ -43,13 +43,13 @@ export const transactions: Transaction[] = [
 ];
 
 export const bids: Bid[] = [
-    { id: '1', gameName: 'Kalyan', betType: 'Jodi', market: 'jodi', number: '28', amount: 10, date: '2024-07-29T10:30:00Z', status: 'Win' },
-    { id: '2', gameName: 'Milan Night', betType: 'Single (Ank)', market: 'open', number: '5', amount: 25, date: '2024-07-29T09:15:00Z', status: 'Loss' },
-    { id: '3', gameName: 'Main Bazar', betType: 'Single Patti', market: 'close', number: '123', amount: 10, date: '2024-07-28T22:00:00Z', status: 'Pending' },
-    { id: '4', gameName: 'Sridevi', betType: 'Double Patti', market: 'open', number: '447', amount: 15, date: '2024-07-28T11:40:00Z', status: 'Win' },
-    { id: '5', gameName: 'Rajdhani Night', betType: 'Jodi', market: 'jodi', number: '91', amount: 50, date: '2024-07-27T21:30:00Z', status: 'Loss' },
-    { id: '6', gameName: 'Kalyan', betType: 'Triple Patti', market: 'close', number: '777', amount: 5, date: '2024-07-27T16:00:00Z', status: 'Loss' },
-    { id: '7', gameName: 'Kalyan', betType: 'Single (Ank)', market: 'open', number: '8', amount: 100, date: '2024-07-26T15:50:00Z', status: 'Win' },
+  { id: '1', gameName: 'Kalyan', betType: 'Jodi', market: 'jodi', number: '28', amount: 10, date: '2024-07-29T10:30:00Z', status: 'Win' },
+  { id: '2', gameName: 'Milan Night', betType: 'Single (Ank)', market: 'open', number: '5', amount: 25, date: '2024-07-29T09:15:00Z', status: 'Loss' },
+  { id: '3', gameName: 'Main Bazar', betType: 'Single Patti', market: 'close', number: '123', amount: 10, date: '2024-07-28T22:00:00Z', status: 'Pending' },
+  { id: '4', gameName: 'Sridevi', betType: 'Double Patti', market: 'open', number: '447', amount: 15, date: '2024-07-28T11:40:00Z', status: 'Win' },
+  { id: '5', gameName: 'Rajdhani Night', betType: 'Jodi', market: 'jodi', number: '91', amount: 50, date: '2024-07-27T21:30:00Z', status: 'Loss' },
+  { id: '6', gameName: 'Kalyan', betType: 'Triple Patti', market: 'close', number: '777', amount: 5, date: '2024-07-27T16:00:00Z', status: 'Loss' },
+  { id: '7', gameName: 'Kalyan', betType: 'Single (Ank)', market: 'open', number: '8', amount: 100, date: '2024-07-26T15:50:00Z', status: 'Win' },
 ];
 
 export const users: User[] = [
