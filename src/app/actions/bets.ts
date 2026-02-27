@@ -62,12 +62,33 @@ async function processTransaction(bids: any[], totalAmount: number, gameName: st
   // Dynamic imports structure like in other actions
   const { verifyJwtToken } = await import('@/lib/jwt');
   const { default: connectToDatabase } = await import('@/lib/db');
-  const { User, Bid: BidModel, Transaction: TransactionModel } = await import('@/lib/models');
+  const { User, Bid: BidModel, Transaction: TransactionModel, Game } = await import('@/lib/models');
+  const { isGameOpen } = await import('@/lib/utils');
 
   const payload = await verifyJwtToken(token);
   if (!payload || !payload.userId) return { error: 'Invalid or expired authentication token.' };
 
   await connectToDatabase();
+
+  // Validate Game Timing
+  const gameDoc = await Game.findOne({ name: gameName });
+  if (!gameDoc) {
+    return { error: 'Game not found.' };
+  }
+
+  // Check if all bids' markets are open
+  // If a bid is 'open' or 'jodi', the open_time must not have passed.
+  // If a bid is 'close', the close_time must not have passed.
+  const hasOpenOrJodiMarket = bids.some(b => b.market === 'open' || b.market === 'jodi' || b.market === 'sangam');
+  const hasCloseMarket = bids.some(b => b.market === 'close');
+
+  if (hasOpenOrJodiMarket && !isGameOpen(gameDoc.open_time)) {
+    return { error: `The Open market for ${gameName} is currently closed.` };
+  }
+
+  if (hasCloseMarket && !isGameOpen(gameDoc.close_time)) {
+    return { error: `The Close market for ${gameName} is currently closed.` };
+  }
 
   // Atomic check and deduct to prevent race conditions during betting
   const user = await User.findOneAndUpdate(
